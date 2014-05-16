@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\fast_matmult\get_char.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\fast_matmult\huge_tlb.cpp"
 				>
 			</File>
@@ -245,7 +249,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\include\fast_matmult\get_char.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\include\fast_matmult\huge_tlb.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\fast_matmult\lang_def.h"
 				>
 			</File>
 			<File

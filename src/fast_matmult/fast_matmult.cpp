@@ -44,8 +44,6 @@ using namespace annlab;
 #define MIN(a, b)       (((a) < (b)) ? (a) : (b))
 #define MAX(a, b)       (((a) > (b)) ? (a) : (b))
 
-namespace annlab {
-
 float_t *matrix_malloc(unsigned int M, unsigned int N,
                        unsigned int alignment)
 {
@@ -232,8 +230,6 @@ bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
         *err_nums = err_cnt;
     return verify_ok;
 }
-
-}  /* namespace annlab */
 
 void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N)
 {

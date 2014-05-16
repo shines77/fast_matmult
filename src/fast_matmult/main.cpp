@@ -24,6 +24,7 @@
 #include <objbase.h>
 #include <mmsystem.h>
 #endif
+#include <conio.h>
 #include <malloc.h>
 
 #if USE_CRTDBG_CHECK
@@ -44,9 +45,8 @@
 #endif
 
 #include "fast_matmult/fast_matmult.h"
+#include "fast_matmult/get_char.h"
 #include "fast_matmult/huge_tlb.h"
-
-using namespace annlab;
 
 /**********************************************************
    Use Visual Leak Detector(vld) for Visual C++,
@@ -59,14 +59,157 @@ using namespace annlab;
 #endif  /* _DEBUG */
 #endif  /* _MSC_VER */
 
+void set_crtdbg_env()
+{
+/* 使用CRTDBG将会检查内存越界问题, 如果你使用了vld, 内存泄漏信息可关闭 */
+#if USE_CRTDBG_CHECK
+    // 设置 CRT 报告模式
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+
+    // 如果已经引用vld.h, 则不显示crtdbg的内存泄漏信息
+#ifndef VLD_RPTHOOK_INSTALL
+    // 进程退出时, 显示内存泄漏信息
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif  /* VLD_RPTHOOK_INSTALL */
+#endif  /* USE_CRTDBG_CHECK */
+}
+
+int get_user_choice(char *display_text, char *tips_format_text_,
+                    int min_value, int max_value, int default_value)
+{
+    const int exit_value    = GETCH_EXIT_PROGRAM;
+    int input_value         = GETCH_DEFUALT_VALUE;
+
+#if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
+    char tips_format_text[] = "Your choice is: [exit = %d]: ? ";
+#else
+    char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
+#endif
+
+    printf("%s", display_text);
+    if (tips_format_text_ == NULL)
+        printf(tips_format_text, exit_value);
+    else
+        printf(tips_format_text_, exit_value);
+    printf("%d", default_value);
+
+    int nchar;
+    do {
+        nchar = iso_getch();
+        if (nchar == MM_VT_KEY_RETURN) {
+            if (input_value == GETCH_DEFUALT_VALUE)
+                input_value = default_value;
+            break;
+        }
+        else if (nchar >= ('0' + min_value) && nchar <= ('0' + max_value)) {
+            input_value = nchar - '0';
+            printf("\x08%d", input_value);
+            fflush(stdout);
+        }
+    } while (1);
+
+    printf("\n\n");
+    return input_value;
+}
+
+int get_routine_mode()
+{
+    const int minValue      = 0;
+    const int maxValue      = 3;
+    const int defaultValue  = 3;
+    const int exitValue     = GETCH_EXIT_PROGRAM;
+    int nInputValue         = GETCH_DEFUALT_VALUE;
+
+#if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
+    /*
+    printf("Please choice program's routine mode:\n\n");
+    printf(
+        "[1] = Pure C/C++ code    that unuse tiling. (simple)\n"
+        "[2] = Pure C/C++ code    that   use tiling. (simple + tiling)\n"
+        "[3] = Use SSEx instructions and use tiling. (default)\n"
+        "[0] = Exit program.\n\n"
+        );
+    printf("Please input your choice and press enter key to continue...\n\n");
+    printf("Your choice is: [exit = %d]: ? %d", exitValue, defaultValue);
+    //*/
+
+    char display_text[] =
+        "Please choice program's routine mode:\n\n"
+        ""
+        "[1] = Pure C/C++ code    that unuse tiling. (simple)\n"
+        "[2] = Pure C/C++ code    that   use tiling. (simple + tiling)\n"
+        "[3] = Use SSEx instructions and use tiling. (default)\n"
+        "[0] = Exit program.\n\n"
+        ""
+        "Please input your choice and press enter key to continue...\n\n";
+
+    char tips_format_text[] = "Your choice is: [exit = %d]: ? ";
+#else
+    /*
+    printf("请选择你要运行的模式:\n\n");
+    printf(
+        "[1] = 不使用 tiling 分块技术的纯 C/C++ 代码.\n"
+        "[2] =   使用 tiling 分块技术的纯 C/C++ 代码.\n"
+        "[3] =   使用 tiling 分块技术和使用 SSEx 指令优化. (默认)\n"
+        "[0] = 退出程序.\n\n"
+        );
+    printf("请输入您的选择并以回车键结束...\n\n");
+    printf("您的选择是: [退出 = %d]: ? %d", exitValue, defaultValue);
+    //*/
+
+    char display_text[] =
+        "请选择你要运行的模式:\n\n"
+        ""
+        "[1] = 不使用 tiling 分块技术的纯 C/C++ 代码.\n"
+        "[2] =   使用 tiling 分块技术的纯 C/C++ 代码.\n"
+        "[3] =   使用 tiling 分块技术和使用 SSEx 指令优化. (默认)\n"
+        "[0] = 退出程序.\n\n"
+        ""
+        "请输入您的选择并以回车键结束...\n\n";
+
+    char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
+#endif
+
+    return get_user_choice(display_text, tips_format_text, 0, 3, 3);
+
+    int nchar;
+    do {
+        nchar = _getch();
+        if (nchar == MM_VT_KEY_RETURN) {
+            if (nInputValue == GETCH_DEFUALT_VALUE)
+                nInputValue = defaultValue;
+            break;
+        }
+        else if (nchar >= ('0' + minValue) && nchar <= ('0' + maxValue)) {
+            nInputValue = nchar - '0';
+            printf("\x08%d", nInputValue);
+            fflush(stdout);
+        }
+    } while (1);
+
+    printf("\n\n");
+    return nInputValue;
+}
+
 int main(int argc, char *argv[])
 {
     unsigned int M, N, K;
+    int routine_mode;
+
+
     M = 256; N = 256; K = 256;
     //M = 512; N = 512; K = 512;
     M = 1024; N = 1024; K = 1024;
     //M = 2048; N = 2048; K = 2048;
     //M = 512; N = 1024; K = 256;
+
+    // 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题)
+    set_crtdbg_env();
+
+    // 获取用户输入的程序运行模式routine_mode
+    routine_mode = get_routine_mode();
+    if (routine_mode == GETCH_EXIT_PROGRAM)
+        goto _EXIT_MAIN;
 
     printf("\n");
     HANDLE hCurrentProcess = GetCurrentProcess();
@@ -98,17 +241,6 @@ int main(int argc, char *argv[])
         }
     }
     printf("\n");
-
-#if USE_CRTDBG_CHECK
-    // 设置 CRT 报告模式
-    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-
-    // 如果已经引用vld.h, 则不显示crtdbg的内存泄漏信息
-#ifndef VLD_RPTHOOK_INSTALL
-    // 进程退出时, 显示内存泄漏信息
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif  /* VLD_RPTHOOK_INSTALL */
-#endif  /* USE_CRTDBG_CHECK */
 
     printf("Hello World!\n\n");
 
@@ -184,6 +316,8 @@ int main(int argc, char *argv[])
     huge_tlb_exit();
 
     printf("\n");
+
+_EXIT_MAIN:
     system("pause");
     return 0;
 }

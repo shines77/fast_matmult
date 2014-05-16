@@ -19,6 +19,8 @@
 #define _OS_WINDOWS_        1
 #endif
 
+#include <fast_matmult/lang_def.h>
+
 #endif  /* (_WIN32 || _WIN64) && _MSC_VER */
 
 #ifndef _ASSEMBLER_
@@ -95,5 +97,26 @@
 #else
     #define COMPSIZE            2
 #endif
+
+/* For Keyboard virtual code */
+
+enum MM_VT_KEYBOARDS {
+    //
+    MM_VT_KEY_FIRST = 0,
+    MM_VT_KEY_TAB = 8,
+    MM_VT_KEY_RETURN = 13,
+    MM_VT_KEY_LAST = 255
+};
+
+#ifndef _USE_GETCHAR
+  #ifdef __linux__
+    #define _USE_GETCHAR        1
+  #else
+    #define _USE_GETCHAR        0
+  #endif
+#endif  /* _USE_GETCHAR */
+
+#define GETCH_DEFUALT_VALUE     (-1)
+#define GETCH_EXIT_PROGRAM      (0)
 
 #endif  /* _COMMON_H_  */

@@ -209,7 +209,8 @@ void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned 
 }
 #endif
 
-namespace annlab {
+/* 这些函数因为用了可变参数, 所有必须声明为C++的调用方式,                  */
+/* 如果要在纯C环境下使用, 自己去掉可变参数就可以了(相应的要调整调用的代码) */
 
 float_t *matrix_malloc(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE);
@@ -230,7 +231,5 @@ bool matrix_compare(const float_t *A, const float_t *B, unsigned int M, unsigned
 
 bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
         int *err_nums = NULL, eMatrixItemOrder order = MatItemOrderAsc);
-
-}  /* namespace annlab */
 
 #endif  /* _FAST_MATMULT_H_ */
