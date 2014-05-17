@@ -17,7 +17,7 @@ static int s_lang_id = LANG_EN_US;
 
 /// <comment>
 ///
-/// 参考: Linux下不区分大小写的strstr函数 
+/// 参考: Linux下不区分大小写的strstr函数
 ///
 /// http://blog.csdn.net/yasi_xi/article/details/7329987
 ///
@@ -40,6 +40,15 @@ char *strstri_(const char *str, const char *str_sub)
     }
     return NULL;
 }
+
+/// <comment>
+///
+/// 参考:
+///
+/// http://stackoverflow.com/questions/12170488/how-to-get-current-locale-of-my-environment
+/// http://msdn.microsoft.com/zh-cn/library/x99tb11d.aspx
+///
+/// </comment>
 
 int get_sys_locale_id(void)
 {
