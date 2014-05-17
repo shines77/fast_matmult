@@ -1050,12 +1050,12 @@ void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N
 
                             mm0 = _mm_mul_pd(mm0, mma);
                             rr0 = _mm_load_pd(&C_[n + 0]);
-                            mm1 = _mm_mul_pd(mm1, mmb);                          
+                            mm1 = _mm_mul_pd(mm1, mmb);
                             rr1 = _mm_load_pd(&C_[n + 2]);
 
                             mm2 = _mm_mul_pd(mm2, mma);
                             mm0 = _mm_add_pd(mm0, rr0);
-                            mm3 = _mm_mul_pd(mm3, mmb);                           
+                            mm3 = _mm_mul_pd(mm3, mmb);
                             mm1 = _mm_add_pd(mm1, rr1);
 
                             rr2 = _mm_load_pd(&C_[n + 4]);
@@ -1163,7 +1163,7 @@ void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N
                                                                           \
         __asm { movapd      xmmword ptr [ecx + (addr) + 4 * 8], xmm2    } \
         __asm { movapd      xmmword ptr [ecx + (addr) + 6 * 8], xmm3    }
-                                                            
+
 void matmult_s_tiling_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
                                float_t *A, float_t *B, float_t *C)
 {
@@ -2346,27 +2346,56 @@ enum TestFunc_Index {
     TEST_FUNC_INDEX_LAST
 };
 
+enum TestFunc_Mask {
+    TEST_FUNC_MASK_NONE = 0,
+    TEST_FUNC_MASK_PURE_C_NO_TILING = 1,
+    TEST_FUNC_MASK_PURE_C_TILING = 2,
+    TEST_FUNC_MASK_SSEX_TILING = 4,
+    TEST_FUNC_MASK_ALL_TILING = 6,
+    TEST_FUNC_MASK_ALL_TEST = 7,
+    TEST_FUNC_MASK_MAX
+};
+
 void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N)
 {
     const unsigned int kAlignment = 128;
     stop_watch stopWatch;
-    double elapsedTime1, elapsedTime2, elapsedTime3, elapsedTime4;
+    double elapsedTime, elapsedTime1, elapsedTime2;
     int err_nums = 0, diff_nums = 0;
     bool verify_ok = false;
+    unsigned int test_func_mask = TEST_FUNC_MASK_NONE;
+
+    char *verify_result[2] = { "error", "ok"   };
+    char *verify_bool[2]   = { "false", "true" };
 
     float_t *A, *B, *C1, *C2, *C3, *C4;
     float_t *tmp1, *tmp2;;
     float_t alpha = 1.0, beta = 0.0;
 
-    // 所有纯C的测试片段
+    printf("matrix_matmult_test().\n\n");
+    printf("M = %d, K = %d, N = %d\n\n", M, K, N);
+
+    // 包含所有纯C的测试
     if (routine_mode == TEST_FUNC_PURE_C_NO_TILING
         || routine_mode == TEST_FUNC_PURE_C_ALL
         || routine_mode == TEST_FUNC_ALL_TEST) {
-            //
+        test_func_mask |= TEST_FUNC_MASK_PURE_C_NO_TILING;
     }
 
-    printf("matrix_matmult_test().\n\n");
-    printf("M = %d, K = %d, N = %d\n\n", M, K, N);
+    // 包含所有纯C(分块)的测试
+    if (routine_mode == TEST_FUNC_PURE_C_TILING
+        || routine_mode == TEST_FUNC_PURE_C_ALL
+        || routine_mode == TEST_FUNC_ALL_TILING
+        || routine_mode == TEST_FUNC_ALL_TEST) {
+        test_func_mask |= TEST_FUNC_MASK_PURE_C_TILING;
+    }
+
+    // 包含所有SSEx(分块)的测试
+    if (routine_mode == TEST_FUNC_SSEX_TILING
+        || routine_mode == TEST_FUNC_ALL_TILING
+        || routine_mode == TEST_FUNC_ALL_TEST) {
+        test_func_mask |= TEST_FUNC_MASK_SSEX_TILING;
+    }
 
 #if USE_LARGE_PAGES
     const int addr_offset = 128;
@@ -2493,560 +2522,474 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
 
     elapsedTime1 = 0.0;
 
-    /**********************************
-     *     matrix_fast_matmult()      *
-     **********************************/
-
     stopWatch.start();
-    matrix_fast_matmult(M, K, N, A, B, C1);
+    //serial_matmult(M, K, N, A, B, C1);
+    matmult_s_row_tiling_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C1, N);
     stopWatch.stop();
-    elapsedTime2 = stopWatch.getMillisec();
+    elapsedTime = stopWatch.getMillisec();
 
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matrix_fast_matmult: Step1], elapsed time: %0.2f ms\n\n", elapsedTime1);
-    printf("[matrix_fast_matmult: Step2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#else
-    printf("[matrix_fast_matmult], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
+    verify_ok = true;
+    printf("[%-36s]  time: %8.2f ms\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime);
+
+    // 所有纯C的测试
+    if ((test_func_mask & TEST_FUNC_MASK_PURE_C_NO_TILING) != 0) {
+
+        /*****************************
+         *     serial_matmult()      *
+         *****************************/
+        //matrix_init_elements(C1, M, N, MatInitZeros);
+
+        stopWatch.start();
+        serial_matmult(M, K, N, A, B, C1);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        //verify_ok = matrix_compare(C1, C2, M, N, &diff_nums);
+        verify_ok = true;
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /*********************************
+         *     matmult_s_row_MxK_N()     *
+         *********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_MxK_N(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxK_N", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /*********************************
+         *     matmult_s_row_KxM_N()     *
+         *********************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_KxM_N", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /****************************************
+         *     matmult_s_row_MxN_K_transB()     *
+         ****************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_MxN_K_transB(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /****************************************
+         *     matmult_s_row_NxM_K_transB()     *
+         ****************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_NxM_K_transB(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxM_K_transB", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
 #if 0
-    /********************************************************
-     *     matmult_s_row_tiling_N_sse2_4x1()      *
-     ********************************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
+        /*********************************
+         *     matmult_s_row_MxN_K()     *
+         *********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
 
-    stopWatch.start();
-    matmult_s_row_tiling_N_sse2_4x1(M, N, K, &alpha, A, K, B, N, &beta, C3, N);
-    stopWatch.stop();
-    elapsedTime1 = stopWatch.getMillisec();
+        stopWatch.start();
+        matmult_s_row_MxN_K(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
 
-    printf("[matmult_s_row_tiling_N_sse2_4x1], elapsed time: %0.2f ms\n\n", elapsedTime1);
-#endif
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-    /*************************************
-     *     gemm_kernel_2x4_penryn()      *
-     *************************************/
-    float_t *C3b = C3;
-    matrix_init_elements(C3b, M, N, MatInitZeros);
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxN_K", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
-    // 先转置矩阵A
-    //matrix_fast_transpose_NxN((float_t *)A, M, K);
-    matrix_fast_transpose_NxN((float_t *)B, K, N);
-
-    stopWatch.start();
-    //gemm_kernel_2x4_penryn(M, N, K, alpha, A, K, B, N, beta, C3b, N, 0);
-    gemm_kernel_2x4_penryn(M, N, K, alpha, A, K, B, K, beta, C3b, M, 0);
-    stopWatch.stop();
-    elapsedTime1 = stopWatch.getMillisec();
-
-    // 计算完以后再转置(还原)矩阵A
-    //matrix_fast_transpose_NxN((float_t *)A, K, M);
-    matrix_fast_transpose_NxN((float_t *)B, N, K);
-
-    matrix_fast_transpose_NxN((float_t *)C3, N, M);
-
-    //C3 -= M * N;
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-    printf("[gemm_kernel_2x4_penryn], elapsed time: %0.2f ms\n\n", elapsedTime1);
-
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*
-    printf("C1[0] = %0.5f, C3[0] = %0.5f\n", C1[0], C3[0]);
-    printf("C1[1] = %0.5f, C3[1] = %0.5f\n", C1[1], C3[1]);
-    printf("C1[%d] = %0.5f, C3[%d] = %0.5f\n", N, C1[0 + N], M, C3[0 + M]);
-    printf("C1[%d] = %0.5f, C3[%d] = %0.5f\n", N + 1, C1[0 + N + 1], M + 1, C3[0 + M + 1]);
-    printf("\n");
-    //*/
-
-    /*******************************************
-     *     matrix_fast_matmult_sse2_4x2()      *
-     *******************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matrix_fast_matmult_sse2_4x2(M, K, N, A, B, C3);
-    stopWatch.stop();
-    elapsedTime2 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matrix_fast_matmult_sse2_4x2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#else
-    printf("[matrix_fast_matmult_sse2_4x2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*****************************************
-     *     matmult_s_tiling_sse2()      *
-     *****************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_tiling_sse2(M, K, N, A, B, C4);
-    stopWatch.stop();
-    elapsedTime2 = stopWatch.getMillisec();
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_tiling_sse2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#else
-    printf("[matmult_s_tiling_sse2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-    /*********************************************
-     *     matmult_s_tiling_sse2_4x2()      *
-     *********************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_tiling_sse2_4x2(M, K, N, A, B, C3);
-    stopWatch.stop();
-    elapsedTime2 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_tiling_sse2_4x2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#else
-    printf("[matmult_s_tiling_sse2_4x2], elapsed time: %0.2f ms\n\n", elapsedTime2);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*****************************
-     *     serial_matmult()      *
-     *****************************/
-#if 1
-    stopWatch.start();
-    serial_matmult(M, K, N, A, B, C2);
-    stopWatch.stop();
-    elapsedTime3 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C2, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[serial_matmult],            elapsed time: %0.2f ms\n\n", elapsedTime3);
-#else
-    printf("[serial_matmult],     elapsed time: %0.2f ms\n\n", elapsedTime3);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#else
-    elapsedTime3 = 0.0;
-#endif
-
-    //goto MATRIX_MULT_EXIT;
-
-#if 0
-    /*******************************************
-     *     matmult_s_row_MxN_K()     *
-     *******************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_MxN_K(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_MxN_K], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_MxN_K], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
 #endif  /* matmult_s_row_MxN_K() */
 
 #if 0
-    /*******************************************
-     *     matmult_s_row_NxM_K()     *
-     *******************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
+        /*********************************
+         *     matmult_s_row_NxM_K()     *
+         *********************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
 
-    stopWatch.start();
-    matmult_s_row_NxM_K(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
+        stopWatch.start();
+        matmult_s_row_NxM_K(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
 
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_NxM_K], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_NxM_K], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxM_K", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
 #endif  /* matmult_s_row_NxM_K() */
 
-    /**************************************************
-     *     matmult_s_row_MxN_K_transB()     *
-     **************************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
+#if 0
+        /*********************************
+         *     matmult_s_row_KxN_M()     *
+         *********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
 
-    stopWatch.start();
-    matmult_s_row_MxN_K_transB(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
+        stopWatch.start();
+        matmult_s_row_KxN_M(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
 
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_MxN_K_transB], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_MxN_K_transB], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_KxN_M", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /**************************************************
-     *     matmult_s_row_NxM_K_transB()     *
-     **************************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_NxM_K_transB(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_NxM_K_transB], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_NxM_K_transB], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /**********************************************************
-     *     matmult_s_row_tiling_MxN_K_transB()      *
-     **********************************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_tiling_MxN_K_transB(M, K, N, A, B, C3);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_tiling_MxN_K_transB], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_tiling_MxN_K_transB], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*******************************************
-     *     matmult_s_row_MxK_N()     *
-     *******************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_MxK_N(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_MxK_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_MxK_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*******************************************
-     *     matmult_s_row_KxM_N()     *
-     *******************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_KxM_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_KxM_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /**************************************************
-     *     matmult_s_row_tiling_MxK_N()     *
-     **************************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_tiling_MxK_N(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_tiling_MxK_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_tiling_MxK_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /**************************************************
-     *     matmult_s_row_tiling_KxM_N()     *
-     **************************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_tiling_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_tiling_KxM_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_tiling_KxM_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /********************************************************
-     *     matmult_s_row_tiling_k_n_m_KxM_N()     *
-     ********************************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_tiling_k_n_m_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_tiling_k_n_m_KxM_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_tiling_k_n_m_KxM_N], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*******************************************************
-     *     matmult_s_row_tiling_KxM_N_sse2()     *
-     *******************************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_tiling_KxM_N_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_tiling_KxM_N_sse2], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_tiling_KxM_N_sse2], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /***********************************************************
-     *     matmult_s_row_tiling_KxM_N_sse2_2x4()     *
-     ***********************************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_row_tiling_KxM_N_sse2_2x4(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_tiling_KxM_N_sse2_2x4], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_tiling_KxM_N_sse2_2x4], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#ifdef DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
+#endif  /* matmult_s_row_KxN_M() */
 
 #if 0
-    /*******************************************
-     *     matmult_s_row_KxN_M()     *
-     *******************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
+        /*********************************
+         *     matmult_s_row_NxK_M()     *
+         *********************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
 
-    stopWatch.start();
-    matmult_s_row_KxN_M(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
+        stopWatch.start();
+        matmult_s_row_NxK_M(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
 
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxK_M", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+#endif  /* matmult_s_row_NxK_M() */
+
+        /*********************************
+         *     matmult_s_col_KxN_M()     *
+         *********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_col_KxN_M(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_col_KxN_M", elapsedTime, verify_result[verify_ok]);
+#if 0
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif
+
+        /*********************************
+         *     matmult_s_col_NxK_M()     *
+         *********************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_col_NxK_M(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_col_NxK_M", elapsedTime, verify_result[verify_ok]);
+#if 0
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif
+    }
+
+    // 所有纯C(分块)的测试
+    if ((test_func_mask & TEST_FUNC_MASK_PURE_C_TILING) != 0) {
+
+        /**********************************
+         *     matrix_fast_matmult()      *
+         **********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matrix_fast_matmult(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
 #if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_KxN_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
+        printf("[%-36s]  time: %8.2f ms\n\n", "matrix_fast_matmult: Step1", elapsedTime1);
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult: Step2", elapsedTime, verify_result[verify_ok]);
 #else
-    printf("[matmult_s_row_KxN_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult", elapsedTime, verify_result[verify_ok]);
 #endif  /* MATRIX_AB_NEED_TRANSPOSE */
 
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-#endif
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /**************************
+         *     matmult_see()      *
+         **************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        serial_matmult_sse(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult_sse", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /****************************************
+         *     matmult_s_row_tiling_MxK_N()     *
+         ****************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_MxK_N(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxK_N", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /****************************************
+         *     matmult_s_row_tiling_KxM_N()     *
+         ****************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /**********************************************
+         *     matmult_s_row_tiling_k_n_m_KxM_N()     *
+         **********************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_k_n_m_KxM_N(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_k_n_m_KxM_N", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /************************************************
+         *     matmult_s_row_tiling_MxN_K_transB()      *
+         ************************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_MxN_K_transB(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+    }
+
+    // 所有SSEx(分块)的测试
+    if ((test_func_mask & TEST_FUNC_MASK_SSEX_TILING) != 0) {
+
+        /*******************************************
+         *     matrix_fast_matmult_sse2_4x2()      *
+         *******************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matrix_fast_matmult_sse2_4x2(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult_sse2_4x2", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /*****************************************
+         *     matmult_s_tiling_sse2()           *
+         *****************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_tiling_sse2(M, K, N, A, B, C4);
+        stopWatch.stop();
+        elapsedTime2 = stopWatch.getMillisec();
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_tiling_sse2", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /*********************************************
+         *     matmult_s_tiling_sse2_4x2()           *
+         *********************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_tiling_sse2_4x2(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_tiling_sse2_4x2", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /*********************************************
+         *     matmult_s_row_tiling_KxM_N_sse2()     *
+         *********************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_KxM_N_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /*************************************************
+         *     matmult_s_row_tiling_KxM_N_sse2_2x4()     *
+         *************************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_KxM_N_sse2_2x4(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2_2x4", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
 #if 0
-    /*******************************************
-     *     matmult_s_row_NxK_M()     *
-     *******************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
+        /**********************************************
+         *     matmult_s_row_tiling_N_sse2_4x1()      *
+         **********************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
 
-    stopWatch.start();
-    matmult_s_row_NxK_M(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
+        stopWatch.start();
+        matmult_s_row_tiling_N_sse2_4x1(M, N, K, &alpha, A, K, B, N, &beta, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
 
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_N_sse2_4x1", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif  /* matmult_s_row_tiling_N_sse2_4x1() */
 
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_row_NxK_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_row_NxK_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
+        /*************************************
+         *     gemm_kernel_2x4_penryn()      *
+         *************************************/
+        float_t *C3b = C3;
+        matrix_init_elements(C3b, M, N, MatInitZeros);
 
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-#endif
+        // 先转置矩阵A
+        //matrix_fast_transpose_NxN((float_t *)A, M, K);
+        matrix_fast_transpose_NxN((float_t *)B, K, N);
 
-    /*******************************************
-     *     matmult_s_col_KxN_M()     *
-     *******************************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
+        stopWatch.start();
+        //gemm_kernel_2x4_penryn(M, N, K, alpha, A, K, B, N, beta, C3b, N, 0);
+        gemm_kernel_2x4_penryn(M, N, K, alpha, A, K, B, K, beta, C3b, M, 0);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
 
-    stopWatch.start();
-    matmult_s_col_KxN_M(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
+        // 计算完以后再转置(还原)矩阵A
+        //matrix_fast_transpose_NxN((float_t *)A, K, M);
+        matrix_fast_transpose_NxN((float_t *)B, N, K);
 
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+        matrix_fast_transpose_NxN((float_t *)C3, N, M);
 
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_col_KxN_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_col_KxN_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
+        //C3 -= M * N;
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
+        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "gemm_kernel_2x4_penryn", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
-    /*******************************************
-     *     matmult_s_col_NxK_M()     *
-     *******************************************/
-    matrix_init_elements(C4, M, N, MatInitZeros);
-
-    stopWatch.start();
-    matmult_s_col_NxK_M(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[matmult_s_col_NxK_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[matmult_s_col_NxK_M], elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
-
-    /*********************************
-     *     matmult_see()      *
-     *********************************/
-    matrix_init_elements(C3, M, N, MatInitZeros);
-
-    stopWatch.start();
-    serial_matmult_sse(M, K, N, A, B, C3);
-    stopWatch.stop();
-    elapsedTime4 = stopWatch.getMillisec();
-
-    diff_nums = 0;
-    verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-    printf("[serial_matmult_sse],         elapsed time: %0.2f ms\n\n", elapsedTime4);
-#else
-    printf("[serial_matmult_sse],  elapsed time: %0.2f ms\n\n", elapsedTime4);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-#if DISPLAY_MATRIX_COMPARE
-    printf("verify_ok = %d, diff_nums = %d, equal_nums = %d\n\n", verify_ok, diff_nums, M * N - diff_nums);
-#endif  /* DISPLAY_MATRIX_COMPARE */
+        /*
+        printf("C1[0] = %0.5f, C3[0] = %0.5f\n", C1[0], C3[0]);
+        printf("C1[1] = %0.5f, C3[1] = %0.5f\n", C1[1], C3[1]);
+        printf("C1[%d] = %0.5f, C3[%d] = %0.5f\n", N, C1[0 + N], M, C3[0 + M]);
+        printf("C1[%d] = %0.5f, C3[%d] = %0.5f\n", N + 1, C1[0 + N + 1], M + 1, C3[0 + M + 1]);
+        printf("\n");
+        //*/
+    }
 
     goto MATRIX_MULT_EXIT;
 

@@ -141,6 +141,7 @@ int get_routine_mode()
         "[1] = Pure C/C++ code   that unused tiling. (simple)\n"
         "[2] = Pure C/C++ code   that    use tiling. (simple + tiling)\n"
         "[3] = Use SSEx instructions and use tiling. (default)\n"
+        "[6] = All above test [1][2][3].\n"
         "[0] = Exit program.\n\n"
         ""
         "Please input your choice and press enter key to continue...\n\n";
@@ -153,6 +154,7 @@ int get_routine_mode()
         "[1] = 不使用 tiling 分块技术的纯 C/C++ 代码.\n"
         "[2] =   使用 tiling 分块技术的纯 C/C++ 代码.\n"
         "[3] =   使用 tiling 分块技术和使用 SSEx 指令优化. (默认)\n"
+        "[6] = 包括以上[1][2][3]所有测试].\n"
         "[0] = 退出程序.\n\n"
         ""
         "请输入您的选择并以回车键结束...\n\n";
@@ -160,36 +162,11 @@ int get_routine_mode()
     char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
 #endif
 
-    return get_user_choice(display_text, tips_format_text, 0, 3, 3);
+    return get_user_choice(display_text, tips_format_text, 0, 9, 6);
 }
 
-int main(int argc, char *argv[])
+void set_thread_affinity()
 {
-    unsigned int M, N, K;
-    int routine_mode;
-
-    M = 256; N = 256; K = 256;
-    //M = 512; N = 512; K = 512;
-    M = 1024; N = 1024; K = 1024;
-    //M = 2048; N = 2048; K = 2048;
-    //M = 512; N = 1024; K = 256;
-
-    // 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题)
-    set_crtdbg_env();
-
-    int lcid, lang_id;
-    
-    lcid = get_sys_locale_id();
-
-    lcid = get_user_locale_id();
-
-    lang_id = set_current_langid(LANG_USER);
-
-    // 获取用户输入的程序运行模式routine_mode
-    routine_mode = get_routine_mode();
-    if (routine_mode == GETCH_EXIT_PROGRAM)
-        goto _EXIT_MAIN;
-
     printf("\n");
     HANDLE hCurrentProcess = GetCurrentProcess();
     DWORD dwProcessAffinity = 0, dwSystemAffinity = 0;
@@ -220,8 +197,34 @@ int main(int argc, char *argv[])
         }
     }
     printf("\n");
+}
 
-    printf("Hello World!\n\n");
+int main(int argc, char *argv[])
+{
+    unsigned int M, N, K;
+    int routine_mode;
+
+    int lcid, lang_id;
+    lcid = get_sys_locale_id();
+    lcid = get_user_locale_id();
+    lang_id = set_current_langid(LANG_USER);
+
+    M = 256; N = 256; K = 256;
+    //M = 512; N = 512; K = 512;
+    M = 1024; N = 1024; K = 1024;
+    //M = 2048; N = 2048; K = 2048;
+    //M = 512; N = 1024; K = 256;
+
+    // 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题)
+    set_crtdbg_env();
+
+    // 设置线程的亲缘性
+    set_thread_affinity();
+
+    // 获取用户输入的程序运行模式routine_mode
+    routine_mode = get_routine_mode();
+    if (routine_mode == GETCH_EXIT_PROGRAM)
+        goto _EXIT_MAIN;
 
     int large_pagesize = huge_tlb_get_pagesize();
     int huge_tlb_inited = huge_tlb_init();
