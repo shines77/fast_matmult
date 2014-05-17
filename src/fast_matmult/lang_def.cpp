@@ -43,18 +43,22 @@ char *strstri_(const char *str, const char *str_sub)
 
 /// <comment>
 ///
-/// 参考:
+/// 参考: How to get current locale of my environment?
 ///
 /// http://stackoverflow.com/questions/12170488/how-to-get-current-locale-of-my-environment
+/// http://blog.csdn.net/code_robot/article/details/5686229
 /// http://msdn.microsoft.com/zh-cn/library/x99tb11d.aspx
 ///
 /// </comment>
 
 int get_sys_locale_id(void)
 {
-    int lang_id = LANG_NONE;
     char *locale;
+    int lang_id = LANG_NONE;
+    
+    // 当 locale 为 "" 时, 根据环境的设置来设定 locale
     setlocale(LC_ALL, "");
+    // 当 locale 为 NULL 时, 函数只做取回当前 locale 操作, 通过返回值传出, 并不改变当前 locale
     locale = setlocale(LC_ALL, NULL);
     // "zh_CN.xxxxx"
     if (strstri_(locale, "zh_cn") != NULL) {
