@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\fast_matmult\lang_def.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\fast_matmult\main.cpp"
 				>
 			</File>

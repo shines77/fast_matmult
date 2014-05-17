@@ -81,6 +81,7 @@ char iso_getche(void)
 {
     char ch = _getch();
     printf("%d", ch);
+    return ch;
 }
 
 void iso_sleep(int millisec)

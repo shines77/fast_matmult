@@ -132,12 +132,14 @@ int get_user_choice(char *display_text, char *tips_format_text_,
 
 int get_routine_mode()
 {
+    int lang_id = get_current_langid();
+
 #if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
     char display_text[] =
         "Please choice program's routine mode:\n\n"
         ""
-        "[1] = Pure C/C++ code    that unuse tiling. (simple)\n"
-        "[2] = Pure C/C++ code    that   use tiling. (simple + tiling)\n"
+        "[1] = Pure C/C++ code   that unused tiling. (simple)\n"
+        "[2] = Pure C/C++ code   that    use tiling. (simple + tiling)\n"
         "[3] = Use SSEx instructions and use tiling. (default)\n"
         "[0] = Exit program.\n\n"
         ""
@@ -174,6 +176,14 @@ int main(int argc, char *argv[])
 
     // 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题)
     set_crtdbg_env();
+
+    int lcid, lang_id;
+    
+    lcid = get_sys_locale_id();
+
+    lcid = get_user_locale_id();
+
+    lang_id = set_current_langid(LANG_USER);
 
     // 获取用户输入的程序运行模式routine_mode
     routine_mode = get_routine_mode();
