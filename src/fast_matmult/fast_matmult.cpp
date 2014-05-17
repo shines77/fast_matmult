@@ -2933,8 +2933,10 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
         printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2_2x4", elapsedTime, verify_result[verify_ok]);
+#if 0
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif
 
 #if 0
         /**********************************************
@@ -2979,8 +2981,10 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
         printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "gemm_kernel_2x4_penryn", elapsedTime, verify_result[verify_ok]);
+#if 0
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif
 
         /*
         printf("C1[0] = %0.5f, C3[0] = %0.5f\n", C1[0], C3[0]);
