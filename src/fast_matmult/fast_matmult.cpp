@@ -2335,7 +2335,18 @@ void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned 
     matrix_fast_transpose_NxN(B, N, K);
 }
 
-void matrix_matmult_test(unsigned int M, unsigned int K, unsigned int N)
+enum TestFunc_Index {
+    TEST_FUNC_INDEX_FIRST = 0,
+    TEST_FUNC_PURE_C_NO_TILING = 1,
+    TEST_FUNC_PURE_C_TILING = 2,
+    TEST_FUNC_PURE_C_ALL = 3,
+    TEST_FUNC_SSEX_TILING = 4,
+    TEST_FUNC_ALL_TILING = 5,
+    TEST_FUNC_ALL_TEST = 6,
+    TEST_FUNC_INDEX_LAST
+};
+
+void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N)
 {
     const unsigned int kAlignment = 128;
     stop_watch stopWatch;
@@ -2346,6 +2357,13 @@ void matrix_matmult_test(unsigned int M, unsigned int K, unsigned int N)
     float_t *A, *B, *C1, *C2, *C3, *C4;
     float_t *tmp1, *tmp2;;
     float_t alpha = 1.0, beta = 0.0;
+
+    // ËùÓÐ´¿CµÄ²âÊÔÆ¬¶Î
+    if (routine_mode == TEST_FUNC_PURE_C_NO_TILING
+        || routine_mode == TEST_FUNC_PURE_C_ALL
+        || routine_mode == TEST_FUNC_ALL_TEST) {
+            //
+    }
 
     printf("matrix_matmult_test().\n\n");
     printf("M = %d, K = %d, N = %d\n\n", M, K, N);

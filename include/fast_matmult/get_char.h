@@ -34,6 +34,8 @@ char iso_getch(void);
 /* Read 1 character with echo */
 char iso_getche(void);
 
+void iso_sleep(int millisec);
+
 #ifdef __cplusplus
 }
 #endif

@@ -3,10 +3,12 @@
 
 #if defined(__linux__)
 #include <termios.h>
+#include <unistd.h>
 #endif  /* __linux__ */
 
 #if defined(_MSC_VER)
 #include <conio.h>
+#include <windows.h>
 #endif  /* _MSC_VER */
 
 #include <fast_matmult/get_char.h>
@@ -61,6 +63,11 @@ char iso_getche(void)
     return iso_getch_(1);
 }
 
+void iso_sleep(int millisec)
+{
+    usleep(millisec * 1000);
+}
+
 #elif defined(_MSC_VER)
 
 /* Read 1 character without echo */
@@ -76,6 +83,11 @@ char iso_getche(void)
     printf("%d", ch);
 }
 
+void iso_sleep(int millisec)
+{
+    ::Sleep(millisec);
+}
+
 #else  /* other unknown os */
 
 /* Read 1 character without echo */
@@ -88,6 +100,19 @@ char iso_getch(void)
 char iso_getche(void)
 {
     return -1;
+}
+
+void iso_sleep(int millisec)
+{
+    // Do nothing !!
+    volatile int sum = 0;
+    int i, j;
+    for (i = 0; i < 50000; ++i) {
+        sum += i;
+        for (j = 2000; j >= 0; --j) {
+            sum -= j;
+        }
+    }
 }
 
 #endif  /* __linux__ */

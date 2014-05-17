@@ -172,7 +172,7 @@ enum eMatInitFcn {
     MatInitFcnMax
 };
 
-void matrix_matmult_test(unsigned int M, unsigned int K, unsigned int N);
+void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N);
 
 void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N);
 

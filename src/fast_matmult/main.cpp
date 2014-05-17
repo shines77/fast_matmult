@@ -79,6 +79,7 @@ int get_user_choice(char *display_text, char *tips_format_text_,
 {
     const int exit_value    = GETCH_EXIT_PROGRAM;
     int input_value         = GETCH_DEFUALT_VALUE;
+    int tmp_value;
 
 #if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
     char tips_format_text[] = "Your choice is: [exit = %d]: ? ";
@@ -101,10 +102,27 @@ int get_user_choice(char *display_text, char *tips_format_text_,
                 input_value = default_value;
             break;
         }
-        else if (nchar >= ('0' + min_value) && nchar <= ('0' + max_value)) {
-            input_value = nchar - '0';
-            printf("\x08%d", input_value);
-            fflush(stdout);
+        else if (nchar >= '0' && nchar <= '9') {
+            tmp_value = nchar - '0';
+            if (tmp_value >= min_value && tmp_value <= max_value) {
+                input_value = tmp_value;
+                printf("\x08%d", input_value);
+                fflush(stdout);
+            }
+            else {
+                // 如果输入的字符不在指定的范围, 显示一下(500毫秒)立刻恢复最后一次正确的选项值
+                printf("\x08%d", tmp_value);
+                fflush(stdout);
+
+                // 休眠500毫秒
+                iso_sleep(500);
+
+                if (input_value != GETCH_DEFUALT_VALUE)
+                    printf("\x08%d", input_value);
+                else
+                    printf("\x08%d", default_value);
+                fflush(stdout);
+            }
         }
     } while (1);
 
@@ -114,25 +132,7 @@ int get_user_choice(char *display_text, char *tips_format_text_,
 
 int get_routine_mode()
 {
-    const int minValue      = 0;
-    const int maxValue      = 3;
-    const int defaultValue  = 3;
-    const int exitValue     = GETCH_EXIT_PROGRAM;
-    int nInputValue         = GETCH_DEFUALT_VALUE;
-
 #if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
-    /*
-    printf("Please choice program's routine mode:\n\n");
-    printf(
-        "[1] = Pure C/C++ code    that unuse tiling. (simple)\n"
-        "[2] = Pure C/C++ code    that   use tiling. (simple + tiling)\n"
-        "[3] = Use SSEx instructions and use tiling. (default)\n"
-        "[0] = Exit program.\n\n"
-        );
-    printf("Please input your choice and press enter key to continue...\n\n");
-    printf("Your choice is: [exit = %d]: ? %d", exitValue, defaultValue);
-    //*/
-
     char display_text[] =
         "Please choice program's routine mode:\n\n"
         ""
@@ -145,18 +145,6 @@ int get_routine_mode()
 
     char tips_format_text[] = "Your choice is: [exit = %d]: ? ";
 #else
-    /*
-    printf("请选择你要运行的模式:\n\n");
-    printf(
-        "[1] = 不使用 tiling 分块技术的纯 C/C++ 代码.\n"
-        "[2] =   使用 tiling 分块技术的纯 C/C++ 代码.\n"
-        "[3] =   使用 tiling 分块技术和使用 SSEx 指令优化. (默认)\n"
-        "[0] = 退出程序.\n\n"
-        );
-    printf("请输入您的选择并以回车键结束...\n\n");
-    printf("您的选择是: [退出 = %d]: ? %d", exitValue, defaultValue);
-    //*/
-
     char display_text[] =
         "请选择你要运行的模式:\n\n"
         ""
@@ -171,31 +159,12 @@ int get_routine_mode()
 #endif
 
     return get_user_choice(display_text, tips_format_text, 0, 3, 3);
-
-    int nchar;
-    do {
-        nchar = _getch();
-        if (nchar == MM_VT_KEY_RETURN) {
-            if (nInputValue == GETCH_DEFUALT_VALUE)
-                nInputValue = defaultValue;
-            break;
-        }
-        else if (nchar >= ('0' + minValue) && nchar <= ('0' + maxValue)) {
-            nInputValue = nchar - '0';
-            printf("\x08%d", nInputValue);
-            fflush(stdout);
-        }
-    } while (1);
-
-    printf("\n\n");
-    return nInputValue;
 }
 
 int main(int argc, char *argv[])
 {
     unsigned int M, N, K;
     int routine_mode;
-
 
     M = 256; N = 256; K = 256;
     //M = 512; N = 512; K = 512;
@@ -311,7 +280,7 @@ int main(int argc, char *argv[])
 #endif
 #endif  /* USE_LARGE_PAGES */
 
-    matrix_matmult_test(M, K, N);
+    matrix_matmult_test(routine_mode, M, K, N);
 
     huge_tlb_exit();
 
