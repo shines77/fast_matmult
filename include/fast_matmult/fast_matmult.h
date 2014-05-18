@@ -172,6 +172,27 @@ enum eMatInitFcn {
     MatInitFcnMax
 };
 
+enum TestFunc_Index {
+    TEST_FUNC_INDEX_FIRST = 0,
+    TEST_FUNC_PURE_C_NO_TILING = 1,
+    TEST_FUNC_PURE_C_TILING = 2,
+    TEST_FUNC_SSEX_TILING = 3,
+    TEST_FUNC_PURE_C_ALL = 4,
+    TEST_FUNC_ALL_TILING = 5,
+    TEST_FUNC_ALL_TEST = 6,
+    TEST_FUNC_INDEX_LAST
+};
+
+enum TestFunc_Mask {
+    TEST_FUNC_MASK_NONE = 0,
+    TEST_FUNC_MASK_PURE_C_NO_TILING = 1,
+    TEST_FUNC_MASK_PURE_C_TILING = 2,
+    TEST_FUNC_MASK_SSEX_TILING = 4,
+    TEST_FUNC_MASK_ALL_TILING = 6,
+    TEST_FUNC_MASK_ALL_TEST = 7,
+    TEST_FUNC_MASK_MAX
+};
+
 void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N);
 
 void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N);
@@ -209,8 +230,8 @@ void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned 
 }
 #endif
 
-/* 这些函数因为用了可变参数, 所有必须声明为C++的调用方式,                  */
-/* 如果要在纯C环境下使用, 自己去掉可变参数就可以了(相应的要调整调用的代码) */
+/* 因为下面这些函数用了可选参数, 所以必须以C++的方式声明,                    */
+/* 如果想要在纯C环境下使用, 自己去掉可变参数就可以了(相应的要调整调用的代码) */
 
 float_t *matrix_malloc(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE);

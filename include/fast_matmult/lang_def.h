@@ -12,7 +12,7 @@
 #define LANG_ZH_CN      1
 #define LANG_ZH_TW      2
 
-#define LANG_ID         LANG_EN_US
+#define LANG_ID         LANG_ZH_CN
 
 #ifdef __cplusplus
 extern "C" {

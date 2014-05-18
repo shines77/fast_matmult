@@ -2335,27 +2335,6 @@ void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned 
     matrix_fast_transpose_NxN(B, N, K);
 }
 
-enum TestFunc_Index {
-    TEST_FUNC_INDEX_FIRST = 0,
-    TEST_FUNC_PURE_C_NO_TILING = 1,
-    TEST_FUNC_PURE_C_TILING = 2,
-    TEST_FUNC_PURE_C_ALL = 3,
-    TEST_FUNC_SSEX_TILING = 4,
-    TEST_FUNC_ALL_TILING = 5,
-    TEST_FUNC_ALL_TEST = 6,
-    TEST_FUNC_INDEX_LAST
-};
-
-enum TestFunc_Mask {
-    TEST_FUNC_MASK_NONE = 0,
-    TEST_FUNC_MASK_PURE_C_NO_TILING = 1,
-    TEST_FUNC_MASK_PURE_C_TILING = 2,
-    TEST_FUNC_MASK_SSEX_TILING = 4,
-    TEST_FUNC_MASK_ALL_TILING = 6,
-    TEST_FUNC_MASK_ALL_TEST = 7,
-    TEST_FUNC_MASK_MAX
-};
-
 void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N)
 {
     const unsigned int kAlignment = 128;

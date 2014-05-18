@@ -138,10 +138,14 @@ int get_routine_mode()
     char display_text[] =
         "Please choice program's routine mode:\n\n"
         ""
-        "[1] = Pure C/C++ code   that unused tiling. (simple)\n"
-        "[2] = Pure C/C++ code   that    use tiling. (simple + tiling)\n"
-        "[3] = Use SSEx instructions and use tiling. (default)\n"
-        "[6] = All above test [1][2][3].\n"
+        "[1] = Pure C/C++ code   that unused tiling.\n"
+        "[2] = Pure C/C++ code   that    use tiling.\n"
+        "[3] = Use SSEx instructions and use tiling.\n"
+        "\n"
+        "[4] = All of pure C/C++ codes:          [1] and [2].\n"
+        "[5] = All of the tests that use tiling: [2] [3].\n"
+        "[6] = All of the above tests:           [1] [2] [3]. (default)\n"
+        "\n"
         "[0] = Exit program.\n\n"
         ""
         "Please input your choice and press enter key to continue...\n\n";
@@ -153,8 +157,12 @@ int get_routine_mode()
         ""
         "[1] = 不使用 tiling 分块技术的纯 C/C++ 代码.\n"
         "[2] =   使用 tiling 分块技术的纯 C/C++ 代码.\n"
-        "[3] =   使用 tiling 分块技术和使用 SSEx 指令优化. (默认)\n"
-        "[6] = 包括以上[1][2][3]所有测试].\n"
+        "[3] =   使用 tiling 分块技术和使用 SSEx 指令优化.\n"
+        "\n"
+        "[4] = 所有 纯 C/C++ 代码的 测试: 包含 [1] [2].\n"
+        "[5] = 所有 使用分块技术的  测试: 包含 [2] [3].\n"
+        "[6] = 所有 以上列举的      测试: 包含 [1] [2] [3]. (默认)\n"
+        "\n"
         "[0] = 退出程序.\n\n"
         ""
         "请输入您的选择并以回车键结束...\n\n";
@@ -162,7 +170,7 @@ int get_routine_mode()
     char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
 #endif
 
-    return get_user_choice(display_text, tips_format_text, 0, 9, 6);
+    return get_user_choice(display_text, tips_format_text, 0, 6, 6);
 }
 
 void set_thread_affinity()
