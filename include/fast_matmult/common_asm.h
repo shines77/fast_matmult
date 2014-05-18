@@ -14,7 +14,7 @@
 #define _OS_WINDOWS_        1
 #endif
 
-#include <tchar.h>
+//#include <tchar.h>
 #include <intrin.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>

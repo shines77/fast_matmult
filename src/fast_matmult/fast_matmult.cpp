@@ -2352,7 +2352,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     float_t alpha = 1.0, beta = 0.0;
 
     printf("matrix_matmult_test().\n\n");
-    printf("M = %d, K = %d, N = %d\n\n", M, K, N);
+    printf("M = %d, N = %d, K = %d\n\n", M, N, K);
 
     // 包含所有纯C的测试
     if (routine_mode == TEST_FUNC_PURE_C_NO_TILING
@@ -2508,7 +2508,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     elapsedTime = stopWatch.getMillisec();
 
     verify_ok = true;
-    printf("[%-36s]  time: %8.2f ms\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime);
+    printf("[%-38s]  time: %8.2f ms\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime);
 
     // 所有纯C的测试
     if ((test_func_mask & TEST_FUNC_MASK_PURE_C_NO_TILING) != 0) {
@@ -2527,7 +2527,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         //verify_ok = matrix_compare(C1, C2, M, N, &diff_nums);
         verify_ok = true;
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2544,7 +2544,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxK_N", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxK_N", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2561,7 +2561,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_KxM_N", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_KxM_N", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2578,7 +2578,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2595,7 +2595,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxM_K_transB", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxM_K_transB", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2613,7 +2613,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxN_K", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_MxN_K", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2633,7 +2633,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxM_K", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxM_K", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2653,7 +2653,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_KxN_M", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_KxN_M", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2673,7 +2673,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxK_M", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_NxK_M", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2692,7 +2692,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_col_KxN_M", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_col_KxN_M", elapsedTime, verify_result[verify_ok]);
 #if 0
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
@@ -2711,7 +2711,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_col_NxK_M", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_col_NxK_M", elapsedTime, verify_result[verify_ok]);
 #if 0
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
@@ -2736,9 +2736,9 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
 
 #if MATRIX_AB_NEED_TRANSPOSE
         printf("[%-36s]  time: %8.2f ms\n\n", "matrix_fast_matmult: Step1", elapsedTime1);
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult: Step2", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult: Step2", elapsedTime, verify_result[verify_ok]);
 #else
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult", elapsedTime, verify_result[verify_ok]);
 #endif  /* MATRIX_AB_NEED_TRANSPOSE */
 
         if (!verify_ok)
@@ -2757,7 +2757,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult_sse", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult_sse", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2774,7 +2774,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxK_N", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxK_N", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2791,7 +2791,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2808,7 +2808,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_k_n_m_KxM_N", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_k_n_m_KxM_N", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2825,7 +2825,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
     }
@@ -2846,7 +2846,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult_sse2_4x2", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult_sse2_4x2", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2860,7 +2860,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         stopWatch.stop();
         elapsedTime2 = stopWatch.getMillisec();
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_tiling_sse2", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_tiling_sse2", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2877,7 +2877,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_tiling_sse2_4x2", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_tiling_sse2_4x2", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2887,14 +2887,14 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         matrix_init_elements(C4, M, N, MatInitZeros);
 
         stopWatch.start();
-        matmult_s_row_tiling_KxM_N_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        matmult_s_row_tiling_KxM_N_sse2_2x4(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
         stopWatch.stop();
         elapsedTime = stopWatch.getMillisec();
 
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2_2x4", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
@@ -2904,14 +2904,14 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         matrix_init_elements(C3, M, N, MatInitZeros);
 
         stopWatch.start();
-        matmult_s_row_tiling_KxM_N_sse2_2x4(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        matmult_s_row_tiling_KxM_N_sse2_2x4_packed(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
         stopWatch.stop();
         elapsedTime = stopWatch.getMillisec();
 
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2_2x4", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_KxM_N_sse2_2x4_pk", elapsedTime, verify_result[verify_ok]);
 #if 0
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
@@ -2928,7 +2928,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         stopWatch.stop();
         elapsedTime = stopWatch.getMillisec();
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_N_sse2_4x1", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_N_sse2_4x1", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 #endif  /* matmult_s_row_tiling_N_sse2_4x1() */
@@ -2959,7 +2959,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
 
-        printf("[%-36s]  time: %8.2f ms, verify: %s\n\n", "gemm_kernel_2x4_penryn", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "gemm_kernel_2x4_penryn", elapsedTime, verify_result[verify_ok]);
 #if 0
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);

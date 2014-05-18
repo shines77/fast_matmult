@@ -3,8 +3,7 @@
 #define _ASSEMBLER_
 #endif
 
-#include "fast_matmult/common_asm.h"
-#include "fast_matmult/gemm_kernel_2x4_penryn.h"
+#include <fast_matmult/gemm_kernel_2x4_penryn.h>
 
 #define TRANSA          1
 #undef  TRANSA

@@ -6,7 +6,7 @@
 #pragma once
 #endif
 
-#include "fast_matmult/common_asm.h"
+#include <fast_matmult/common_asm.h>
 #include <fast_matmult/fast_matmult.h>
 
 #ifdef __cplusplus

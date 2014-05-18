@@ -3,8 +3,8 @@
 #define _ASSEMBLER_
 #endif
 
-#include "fast_matmult/common_asm.h"
-#include "fast_matmult/matmult_s_row_tiling_N_sse2_4x1.h"
+#include <fast_matmult/common_asm.h>
+#include <fast_matmult/matmult_s_row_tiling_N_sse2_4x1.h>
 
 #define STACK           16
 #define ARGS            16
