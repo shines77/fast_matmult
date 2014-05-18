@@ -584,21 +584,22 @@ L01:
 
                 ///////////////////////////////////////////////////////////
 
-                movapd      xmm7, xmmword ptr [AA + 0 * FLOAT_SIZE]
+                movapd      xmm6, xmmword ptr [AA + 0 * FLOAT_SIZE]
 
                 movapd      xmm2, xmmword ptr [BB + 0 * FLOAT_SIZE]
-                movapd      xmm3, xmmword ptr [BB + 2 * FLOAT_SIZE]
-
-                xorps       xmm4, xmm4
-                pshufd      xmm0, xmm7, 0x44
-                xorps       xmm5, xmm5
-                pshufd      xmm1, xmm7, 0xee
+                pshufd      xmm0, xmm6, 0x44
+                movapd      xmm3, xmmword ptr [BB + 2 * FLOAT_SIZE]                
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm0
 
+                xorps       xmm4, xmm4
+                xorps       xmm5, xmm5
+
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
+
+                pshufd      xmm1, xmm6, 0xee
 
                 movapd      xmm2, xmmword ptr [BB + LDB + 0 * FLOAT_SIZE]
                 movapd      xmm3, xmmword ptr [BB + LDB + 2 * FLOAT_SIZE]
@@ -606,16 +607,17 @@ L01:
                 mulpd       xmm2, xmm1
                 mulpd       xmm3, xmm1
 
+                movapd      xmm7, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
+                xorps       xmm6, xmm6
+                pshufd      xmm0, xmm7, 0x44
+
                 addpd       xmm4, xmm2          
                 addpd       xmm5, xmm3
 
                 ///////////////////////////////////////////
 
-                movapd      xmm3, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
-                xorps       xmm6, xmm6
-                pshufd      xmm0, xmm3, 0x44
+                pshufd      xmm1, xmm7, 0xee
                 xorps       xmm7, xmm7
-                pshufd      xmm1, xmm3, 0xee
 
                 movapd      xmm2, xmmword ptr [BB + 0 * FLOAT_SIZE]
                 movapd      xmm3, xmmword ptr [BB + 2 * FLOAT_SIZE]

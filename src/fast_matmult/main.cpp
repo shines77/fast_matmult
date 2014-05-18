@@ -47,6 +47,9 @@
 #include "fast_matmult/fast_matmult.h"
 #include "fast_matmult/get_char.h"
 #include "fast_matmult/huge_tlb.h"
+#include "fast_matmult/stop_watch.h"
+
+using namespace annlab;
 
 /**********************************************************
    Use Visual Leak Detector(vld) for Visual C++,
@@ -171,6 +174,33 @@ int get_routine_mode()
 #endif
 
     return get_user_choice(display_text, tips_format_text, 0, 6, 3);
+}
+
+/* 预热时间至少要大于500毫秒, 如果还不够, 可以自行增加最小预热时间 */
+void iso_cpu_warm_up()
+{
+#ifndef _DEBUG
+    stop_watch sw;
+    volatile int sum = 0;
+    double elapsedTime = 0.0;
+    printf("CPU warm up start ...\n");
+    do {
+        sw.restart();
+        // 如果有聪明的编译器能发现这是一个固定值就牛比了, 应该没有
+        for (int i = 0; i < 10000; ++i) {
+            sum += i;
+            // 循环顺序故意颠倒过来的
+            for (int j = 5000; j >= 0; --j) {
+                sum -= j;
+            }
+        }
+        sw.stop();
+        elapsedTime += sw.getMillisec();
+    } while (elapsedTime < 500.0);
+    // 输出sum的值只是为了防止编译器把循环优化掉
+    printf("sum = %u, time: %0.3f ms\n", sum, elapsedTime);
+    printf("CPU warm up done ... \n\n");
+#endif
 }
 
 void set_thread_affinity()
@@ -301,6 +331,8 @@ int main(int argc, char *argv[])
   #endif
 #endif
 #endif  /* USE_LARGE_PAGES */
+
+    iso_cpu_warm_up();
 
     matrix_matmult_test(routine_mode, M, K, N);
 
