@@ -170,7 +170,7 @@ int get_routine_mode()
     char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
 #endif
 
-    return get_user_choice(display_text, tips_format_text, 0, 6, 6);
+    return get_user_choice(display_text, tips_format_text, 0, 6, 3);
 }
 
 void set_thread_affinity()
@@ -210,7 +210,7 @@ void set_thread_affinity()
 int main(int argc, char *argv[])
 {
     unsigned int M, N, K;
-    int routine_mode;
+    int routine_mode = 0;
 
     int lcid, lang_id;
     lcid = get_sys_locale_id();
@@ -230,7 +230,8 @@ int main(int argc, char *argv[])
     set_thread_affinity();
 
     // 获取用户输入的程序运行模式routine_mode
-    routine_mode = get_routine_mode();
+    routine_mode = 3;
+    //routine_mode = get_routine_mode();
     if (routine_mode == GETCH_EXIT_PROGRAM)
         goto _EXIT_MAIN;
 

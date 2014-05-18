@@ -13,7 +13,7 @@
 #define NN      eax
 
 #ifndef USE_INSTRUCTION_REORDER
-#define USE_INSTRUCTION_REORDER     0
+#define USE_INSTRUCTION_REORDER     1
 #endif
 
 #ifndef USE_PREFETCH
@@ -483,6 +483,7 @@ L01:
 
                 ///////////////////////////////////////////////////////////
 
+#if 1
                 movapd      xmm0, xmmword ptr [CC + 0   + 0 * FLOAT_SIZE]
                 movapd      xmm1, xmmword ptr [CC + 0   + 2 * FLOAT_SIZE]
                 movapd      xmm2, xmmword ptr [CC + LDC + 0 * FLOAT_SIZE]
@@ -497,6 +498,19 @@ L01:
                 movapd      xmmword ptr [CC + 0   + 2 * FLOAT_SIZE], xmm5
                 movapd      xmmword ptr [CC + LDC + 0 * FLOAT_SIZE], xmm6
                 movapd      xmmword ptr [CC + LDC + 2 * FLOAT_SIZE], xmm7
+#else
+                addpd       xmm4, xmmword ptr [CC + 0   + 0 * FLOAT_SIZE]
+                addpd       xmm5, xmmword ptr [CC + 0   + 2 * FLOAT_SIZE]
+
+                addpd       xmm6, xmmword ptr [CC + LDC + 0 * FLOAT_SIZE]
+                addpd       xmm7, xmmword ptr [CC + LDC + 2 * FLOAT_SIZE]
+
+                movapd      xmmword ptr [CC + 0   + 0 * FLOAT_SIZE], xmm4
+                movapd      xmmword ptr [CC + 0   + 2 * FLOAT_SIZE], xmm5
+
+                movapd      xmmword ptr [CC + LDC + 0 * FLOAT_SIZE], xmm6
+                movapd      xmmword ptr [CC + LDC + 2 * FLOAT_SIZE], xmm7
+#endif
 
                 ///////////////////////////////////////////////////////////
 
@@ -520,6 +534,225 @@ L01:
         } while (0);
 
         TILING_INNER_LOOP_END_EX();
+
+#elif 1
+        // ÄÚ²ãÑ­»·Ë³Ðò: k, m - n
+        TILING_INNER_LOOP_BEGIN_EX(k, m, 4, 2);
+        //TILING_INNER_LOOP_BEGIN_EX(m, k, 2, 4);
+
+        do {
+            A_ = &A[m * lda + k];
+
+            B_ = &B[k * ldb + n_start];
+            C_ = &C[m * ldc + n_start];
+
+            n = (n_end - n_start);
+
+            __asm {
+                push        edi
+                push        esi
+                push        eax
+                push        ecx
+                push        ebx
+                push        edx
+
+                ///////////////////////////////////////////////////////////
+
+                mov         AA, A_
+                mov         BB, B_
+                mov         CC, C_
+
+                mov         LDA, lda
+                mov         LDB, ldb
+
+                lea         LDA, [LDA * FLOAT_SIZE]
+                lea         LDB, [LDB * FLOAT_SIZE]
+
+                mov         NN, n
+
+                ALIGN_16
+L01:
+    #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
+                PREFETCH_B  byte ptr [BB + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
+                PREFETCH_B  byte ptr [BB + LDC + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
+    #endif
+
+    #if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
+                PREFETCH_C  byte ptr [CC + 0    + (PREFETCH_SIZE_C + 1) * FLOAT_SIZE]
+                PREFETCH_C  byte ptr [CC + LDC  + (PREFETCH_SIZE_C + 3) * FLOAT_SIZE]
+    #endif
+
+                ///////////////////////////////////////////////////////////
+
+                movapd      xmm7, xmmword ptr [AA + 0 * FLOAT_SIZE]
+
+                movapd      xmm2, xmmword ptr [BB + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [BB + 2 * FLOAT_SIZE]
+
+                xorps       xmm4, xmm4
+                pshufd      xmm0, xmm7, 0x44
+                xorps       xmm5, xmm5
+                pshufd      xmm1, xmm7, 0xee
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm0
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + LDB + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [BB + LDB + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm1
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2          
+                addpd       xmm5, xmm3
+
+                ///////////////////////////////////////////
+
+                movapd      xmm3, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
+                xorps       xmm6, xmm6
+                pshufd      xmm0, xmm3, 0x44
+                xorps       xmm7, xmm7
+                pshufd      xmm1, xmm3, 0xee
+
+                movapd      xmm2, xmmword ptr [BB + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [BB + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm0
+
+                addpd       xmm6, xmm2               
+                addpd       xmm7, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + LDB + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [BB + LDB + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm1
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2                
+                addpd       xmm7, xmm3
+
+                ///////////////////////////////////////////////////////////
+
+    #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
+                PREFETCH_B  byte ptr [BB + LDC * 2 + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
+    #endif
+
+                movapd      xmm3, xmmword ptr [AA + 2 * FLOAT_SIZE]
+                pshufd      xmm0, xmm3, 0x44
+
+                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]
+                pshufd      xmm1, xmm3, 0xee
+                movapd      xmm3, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm0
+
+                //add         BB, LDB
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                add         BB, LDB
+
+    #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
+                PREFETCH_B  byte ptr [BB + LDC * 2 + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
+    #endif
+
+                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm1
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2 
+                addpd       xmm5, xmm3
+
+                ///////////////////////////////////////////
+
+                movapd      xmm3, xmmword ptr [AA + LDA + 2 * FLOAT_SIZE]
+                pshufd      xmm0, xmm3, 0x44
+
+                movapd      xmm2, xmmword ptr [BB + LDB * 1 + 0 * FLOAT_SIZE]
+                pshufd      xmm1, xmm3, 0xee
+                movapd      xmm3, xmmword ptr [BB + LDB * 1 + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm0
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]
+
+                mulpd       xmm2, xmm1
+                mulpd       xmm3, xmm1
+
+                //sub         BB, LDB
+
+                addpd       xmm6, xmm2 
+                addpd       xmm7, xmm3
+
+                sub         BB, LDB
+
+                ///////////////////////////////////////////////////////////
+
+#if 1
+                movapd      xmm0, xmmword ptr [CC + 0   + 0 * FLOAT_SIZE]
+                movapd      xmm1, xmmword ptr [CC + 0   + 2 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [CC + LDC + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [CC + LDC + 2 * FLOAT_SIZE]
+
+                addpd       xmm4, xmm0
+                addpd       xmm5, xmm1
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                movapd      xmmword ptr [CC + 0   + 0 * FLOAT_SIZE], xmm4
+                movapd      xmmword ptr [CC + 0   + 2 * FLOAT_SIZE], xmm5
+                movapd      xmmword ptr [CC + LDC + 0 * FLOAT_SIZE], xmm6
+                movapd      xmmword ptr [CC + LDC + 2 * FLOAT_SIZE], xmm7
+#else
+                addpd       xmm4, xmmword ptr [CC + 0   + 0 * FLOAT_SIZE]
+                addpd       xmm5, xmmword ptr [CC + 0   + 2 * FLOAT_SIZE]
+
+                addpd       xmm6, xmmword ptr [CC + LDC + 0 * FLOAT_SIZE]
+                addpd       xmm7, xmmword ptr [CC + LDC + 2 * FLOAT_SIZE]
+
+                movapd      xmmword ptr [CC + 0   + 0 * FLOAT_SIZE], xmm4
+                movapd      xmmword ptr [CC + 0   + 2 * FLOAT_SIZE], xmm5
+
+                movapd      xmmword ptr [CC + LDC + 0 * FLOAT_SIZE], xmm6
+                movapd      xmmword ptr [CC + LDC + 2 * FLOAT_SIZE], xmm7
+#endif
+
+                ///////////////////////////////////////////////////////////
+
+                add         BB, 4 * FLOAT_SIZE
+                add         CC, 4 * FLOAT_SIZE
+
+                //sub         BB, LDB
+                sub         NN, 4
+
+                jg          L01
+
+                ///////////////////////////////////////////////////////////
+
+                pop         edx
+                pop         ebx
+                pop         ecx
+                pop         eax
+                pop         esi
+                pop         edi
+            }
+        } while (0);
+
+        TILING_INNER_LOOP_END_EX();
+
 #else
         // ÄÚ²ãÑ­»·Ë³Ðò: k, m - n
         TILING_INNER_LOOP_BEGIN_EX(k, m, 4, 2);

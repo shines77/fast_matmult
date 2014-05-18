@@ -143,6 +143,10 @@
     #define HALT		hlt
 #endif
 
+#ifndef xorpd
+#define xorpd           xorps
+#endif
+
 #ifndef movapd
 #define movapd          movaps
 #endif
