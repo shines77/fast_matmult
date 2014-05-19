@@ -9,10 +9,10 @@
 #include <stdlib.h>
 
 #include <fast_matmult/fast_matmult.h>
-#include <fast_matmult/matmult_s_row_tiling_N_sse2_2x4.h>
-#include <fast_matmult/matmult_s_row_tiling_N_sse2_2x4_packed.h>
-#include <fast_matmult/matmult_s_row_tiling_N_sse2_4x1.h>
-#include <fast_matmult/gemm_kernel_2x4_penryn.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_N_sse2_2x4.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_N_sse2_2x4_packed.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_N_sse2_4x1.h>
+#include <fast_matmult/colmajor/gemm_kernel_2x4_penryn.h>
 
 #ifdef __cplusplus
 extern "C" {

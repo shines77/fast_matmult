@@ -1,5 +1,5 @@
 
-#include <fast_matmult/matmult_s_row_tiling_N.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_N.h>
 
 void matmult_s_row_tiling_MxK_N(const int M, const int N, const int K,
                                 const float_t alpha,

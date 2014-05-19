@@ -205,31 +205,27 @@
 					Name="rowmajor"
 					>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\gemm_kernel_2x4_penryn.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_K.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_row_tiling_K.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_row_tiling_N.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_row_tiling_N_sse2_2x4.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4_packed.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_row_tiling_N_sse2_2x4_packed.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\\matmult_s_row_tiling_N_sse2_4x1.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_row_tiling_N_sse2_4x1.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_row_X.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_X.cpp"
 						>
 					</File>
 				</Filter>
@@ -237,7 +233,11 @@
 					Name="colmajor"
 					>
 					<File
-						RelativePath="..\..\..\..\src\fast_matmult\matmult_s_col_X.cpp"
+						RelativePath="..\..\..\..\src\fast_matmult\colmajor\gemm_kernel_2x4_penryn.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\fast_matmult\colmajor\matmult_s_col_X.cpp"
 						>
 					</File>
 				</Filter>
@@ -291,31 +291,27 @@
 					Name="rowmajor"
 					>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\gemm_kernel_2x4_penryn.h"
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_row_tiling_K.h"
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_row_tiling_N.h"
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_row_tiling_N_sse2_2x4.h"
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4_packed.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_row_tiling_N_sse2_2x4_packed.h"
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_4x1.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_row_tiling_N_sse2_4x1.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_row_X.h"
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_X.h"
 						>
 					</File>
 				</Filter>
@@ -323,7 +319,11 @@
 					Name="colmajor"
 					>
 					<File
-						RelativePath="..\..\..\..\include\fast_matmult\matmult_s_col_X.h"
+						RelativePath="..\..\..\..\include\fast_matmult\colmajor\gemm_kernel_2x4_penryn.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\fast_matmult\colmajor\matmult_s_col_X.h"
 						>
 					</File>
 				</Filter>

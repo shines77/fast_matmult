@@ -1,5 +1,5 @@
 
-#include <fast_matmult/matmult_s_row_tiling_N_sse2_2x4.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_N_sse2_2x4.h>
 
 #define LDA     ecx
 #define LDB     ebx

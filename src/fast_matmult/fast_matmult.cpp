@@ -18,10 +18,10 @@
 #include "fast_matmult/stop_watch.h"
 #include "fast_matmult/huge_tlb.h"
 
-#include "fast_matmult/matmult_s_row_X.h"
-#include "fast_matmult/matmult_s_col_X.h"
-#include "fast_matmult/matmult_s_row_tiling_K.h"
-#include "fast_matmult/matmult_s_row_tiling_N.h"
+#include "fast_matmult/rowmajor/matmult_s_row_X.h"
+#include "fast_matmult/rowmajor/matmult_s_row_tiling_K.h"
+#include "fast_matmult/rowmajor/matmult_s_row_tiling_N.h"
+#include "fast_matmult/colmajor/matmult_s_col_X.h"
 
 using namespace annlab;
 
