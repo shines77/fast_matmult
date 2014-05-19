@@ -1,7 +1,5 @@
 
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include <fast_matmult/rowmajor/matmult_s_row_Misc.h>
 

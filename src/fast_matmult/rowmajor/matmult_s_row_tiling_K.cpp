@@ -49,7 +49,7 @@ void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
             B_ = &B[k_start * ldb + n];
             //C_ = &C[m * ldc + n];
 
-            C_m_n = C[m * ldc + n];
+            C_m_n = (float_t)0.0;
 
             // ×îÄÚ²ãÑ­»·: k
             for (k = k_start; k < k_end; ++k) {
@@ -58,7 +58,7 @@ void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
                 C_m_n += (*A_++) * (*B_);
                 B_ += ldb;
             }
-            C[m * ldc + n] = C_m_n;
+            C[m * ldc + n] += C_m_n;
         } while (0);
 
         TILING_INNER_LOOP_END();
