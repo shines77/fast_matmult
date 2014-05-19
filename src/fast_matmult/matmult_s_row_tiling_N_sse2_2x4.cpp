@@ -22,15 +22,15 @@
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
 
 #ifndef USE_PREFETCH_C
-#define USE_PREFETCH_C      1
+#define USE_PREFETCH_C      0
 #endif
 
 #ifndef USE_PREFETCH_A
-#define USE_PREFETCH_A      0
+#define USE_PREFETCH_A      1
 #endif
 
 #ifndef USE_PREFETCH_B
-#define USE_PREFETCH_B      1
+#define USE_PREFETCH_B      0
 #endif
 
 #else  /* !USE_PREFETCH */
@@ -55,15 +55,19 @@
 #endif
 
 #ifndef PREFETCH_B
-#define PREFETCH_B          prefetcht0
+#define PREFETCH_B          prefetchnta
 #endif
 
 #ifndef PREFETCH_SIZE_C
 #define PREFETCH_SIZE_C     (8 * 13 + 0)
 #endif
 
+#ifndef PREFETCH_SIZE_A
+#define PREFETCH_SIZE_A     (8 * 15 + 4)
+#endif
+
 #ifndef PREFETCH_SIZE_B
-#define PREFETCH_SIZE_B     (8 * 15 + 4)
+#define PREFETCH_SIZE_B     (8 * 17 + 4)
 #endif
 
 void matmult_s_row_tiling_KxM_N_sse2_2x4(const int M, const int N, const int K,
@@ -89,17 +93,52 @@ void matmult_s_row_tiling_KxM_N_sse2_2x4(const int M, const int N, const int K,
     k_step = 128;
     n_step = 512;
 
+    /*
+    // 只打开A(t0)的预读, 453.xx ms
     m_step = 64;
     k_step = 256;
     n_step = 512;
+    //*/
+
+    /*
+    // 只打开A(t0)的预读, 456.xx ms
+    m_step = 128;
+    k_step = 1024;
+    n_step = 512;
+    //*/
+
+    /*
+    // 打开A(t0), B(nta)的预读, 509.xx ms
+    m_step = 128;
+    k_step = 1024;
+    n_step = 512;
+    //*/
+
+    /*
+    // 打开A(t0), B(nta)的预读, 507.xx ms
+    m_step = 64;
+    k_step = 128;
+    n_step = 512;
+    //*/
 #else
+    // 439.xx ms
     m_step = 8;
     k_step = 128;
     n_step = 512;
 
+    ///*
+    // 430.xx ms
     m_step = 64;
     k_step = 128;
     n_step = 512;
+    //*/
+
+    /*
+    // 433.xx ms
+    m_step = 64;
+    k_step = 256;
+    n_step = 512;
+    //*/
 #endif
 
 #if 0
@@ -370,6 +409,10 @@ L01:
 
                 ALIGN_16
 L01:
+    #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
+                PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 0) * FLOAT_SIZE]
+    #endif
+
     #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
                 PREFETCH_B  byte ptr [BB + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
                 PREFETCH_B  byte ptr [BB + LDC + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]

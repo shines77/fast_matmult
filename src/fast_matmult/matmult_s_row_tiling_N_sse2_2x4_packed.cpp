@@ -22,15 +22,15 @@
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
 
 #ifndef USE_PREFETCH_C
-#define USE_PREFETCH_C      1
+#define USE_PREFETCH_C      0
 #endif
 
 #ifndef USE_PREFETCH_A
-#define USE_PREFETCH_A      0
+#define USE_PREFETCH_A      1
 #endif
 
 #ifndef USE_PREFETCH_B
-#define USE_PREFETCH_B      1
+#define USE_PREFETCH_B      0
 #endif
 
 #else  /* !USE_PREFETCH */
@@ -55,15 +55,19 @@
 #endif
 
 #ifndef PREFETCH_B
-#define PREFETCH_B          prefetcht0
+#define PREFETCH_B          prefetchnta
 #endif
 
 #ifndef PREFETCH_SIZE_C
 #define PREFETCH_SIZE_C     (8 * 13 + 0)
 #endif
 
+#ifndef PREFETCH_SIZE_A
+#define PREFETCH_SIZE_A     (8 * 15 + 4)
+#endif
+
 #ifndef PREFETCH_SIZE_B
-#define PREFETCH_SIZE_B     (8 * 15 + 4)
+#define PREFETCH_SIZE_B     (8 * 17 + 4)
 #endif
 
 void matmult_s_row_tiling_KxM_N_sse2_2x4_packed(const int M, const int N, const int K,
@@ -85,17 +89,43 @@ void matmult_s_row_tiling_KxM_N_sse2_2x4_packed(const int M, const int N, const 
     float_t A_m_k = (float_t)0.0;
 
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
+    // 打开C, B的预读
     m_step = 64;
-    k_step = 256;
+    k_step = 128;
     n_step = 512;
+
+    /*
+    // 只打开A(t0)的预读, 431.xx ms
+    m_step = 128;
+    k_step = 1024;
+    n_step = 512;
+    //*/
+
+    /*
+    // 打开A(t0), B(nta)的预读, 455.xx ms
+    m_step = 128;
+    k_step = 1024;
+    n_step = 512;
+    //*/
+
+    /*
+    // 打开A(t0), B(nta)的预读, 459.xx ms
+    m_step = 64;
+    k_step = 128;
+    n_step = 512;
+    //*/
 #else
+    // 435.xx ms
     m_step = 8;
     k_step = 128;
     n_step = 512;
 
+    ///*
+    // 428.xx ms
     m_step = 64;
     k_step = 128;
     n_step = 512;
+    //*/
 #endif
 
 #if 0
@@ -175,6 +205,10 @@ L01:
     #if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
                 PREFETCH_C  byte ptr [CC + 0    + (PREFETCH_SIZE_C + 1) * FLOAT_SIZE]
                 PREFETCH_C  byte ptr [CC + LDC  + (PREFETCH_SIZE_C + 3) * FLOAT_SIZE]
+    #endif
+
+    #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
+                PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 0) * FLOAT_SIZE]
     #endif
 
     #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
@@ -342,11 +376,8 @@ L01:
                 mov         BB, B_
                 mov         CC, C_
 
-                //mov         LDA, lda
-                mov         LDB, ldb
-
-                //lea         LDA, [LDA * FLOAT_SIZE]
-                lea         LDB, [LDB * FLOAT_SIZE]
+                mov         LDC, ldc
+                lea         LDC, [LDC * FLOAT_SIZE]
 
                 mov         NN, n
 
@@ -355,6 +386,10 @@ L01:
     #if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
                 PREFETCH_C  byte ptr [CC + 0    + (PREFETCH_SIZE_C + 1) * FLOAT_SIZE]
                 PREFETCH_C  byte ptr [CC + LDC  + (PREFETCH_SIZE_C + 3) * FLOAT_SIZE]
+    #endif
+
+    #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
+                PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 0) * FLOAT_SIZE]
     #endif
 
     #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
@@ -415,6 +450,10 @@ L01:
 
                 addpd       xmm6, xmm2                
                 addpd       xmm7, xmm3
+
+    #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
+                PREFETCH_B  byte ptr [BB + (PREFETCH_SIZE_B + 8) * FLOAT_SIZE]
+    #endif
 
                 ///////////////////////////////////////////////////////////
 

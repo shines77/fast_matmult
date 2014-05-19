@@ -236,6 +236,9 @@ void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned 
 float_t *matrix_malloc(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE);
 
+float_t *matrix_offset_malloc(unsigned int M, unsigned int N,
+            unsigned int alignment = DEFAULT_CACHELINE, unsigned int offset = 0);
+
 float_t *matrix_malloc_ex(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE,
             eMatInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
