@@ -19,7 +19,7 @@ extern int s_huge_tlb_inited;
 extern int s_large_pagesize;
 
 int  huge_tlb_init();
-void huge_tlb_exit();
+void huge_tlb_exit(int echo);
 
 int  huge_tlb_is_inited();
 

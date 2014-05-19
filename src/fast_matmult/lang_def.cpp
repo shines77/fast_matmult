@@ -11,7 +11,7 @@
 
 #include <fast_matmult/lang_def.h>
 
-static int s_lang_id = LANG_EN_US;
+static int s_lang_id = LANG_NONE;
 
 #if defined(__linux__)
 
@@ -152,6 +152,8 @@ int get_user_locale_id(void)
 
 int get_current_langid(void)
 {
+    if (s_lang_id == LANG_NONE)
+        s_lang_id = get_user_locale_id();
     return s_lang_id;
 }
 

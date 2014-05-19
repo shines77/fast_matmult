@@ -2359,8 +2359,12 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     float_t *tmp1, *tmp2;;
     float_t alpha = 1.0, beta = 0.0;
 
-    printf("matrix_matmult_test().\n\n");
-    printf("M = %d, N = %d, K = %d\n\n", M, N, K);
+#if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
+    printf("matrix_matmult_test() start...\n\n");
+#else
+    printf("[矩阵乘法测试程序] 开始...\n\n");
+#endif
+    //printf("M = %d, N = %d, K = %d\n\n", M, N, K);
 
     // 包含所有纯C的测试
     if (routine_mode == TEST_FUNC_PURE_C_NO_TILING
@@ -2567,10 +2571,13 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     elapsedTime = stopWatch.getMillisec();
 
     verify_ok = true;
-    printf("[%-38s]  time: %8.2f ms\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime);
+    printf("[0] 用于验证的标准算法:\n\n");
+    printf("[%-38s]  time: %8.2f ms, type: rowmajor\n\n", "matmult_s_row_tiling_KxM_N", elapsedTime);
 
     // 所有纯C的测试
     if ((test_func_mask & TEST_FUNC_MASK_PURE_C_NO_TILING) != 0) {
+
+        printf("[1] 不使用 tiling 分块技术的纯 C/C++ 代码:\n\n");
 
         /*****************************
          *     serial_matmult()      *
@@ -2780,45 +2787,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     // 所有纯C(分块)的测试
     if ((test_func_mask & TEST_FUNC_MASK_PURE_C_TILING) != 0) {
 
-        /**********************************
-         *     matrix_fast_matmult()      *
-         **********************************/
-        matrix_init_elements(C3, M, N, MatInitZeros);
-
-        stopWatch.start();
-        matrix_fast_matmult(M, K, N, A, B, C3);
-        stopWatch.stop();
-        elapsedTime = stopWatch.getMillisec();
-
-        diff_nums = 0;
-        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-#if MATRIX_AB_NEED_TRANSPOSE
-        printf("[%-38s]  time: %8.2f ms\n\n", "matrix_fast_matmult: Step1", elapsedTime1);
-        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult: Step2", elapsedTime, verify_result[verify_ok]);
-#else
-        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult", elapsedTime, verify_result[verify_ok]);
-#endif  /* MATRIX_AB_NEED_TRANSPOSE */
-
-        if (!verify_ok)
-            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
-
-        /**************************
-         *     matmult_see()      *
-         **************************/
-        matrix_init_elements(C3, M, N, MatInitZeros);
-
-        stopWatch.start();
-        serial_matmult_sse(M, K, N, A, B, C3);
-        stopWatch.stop();
-        elapsedTime = stopWatch.getMillisec();
-
-        diff_nums = 0;
-        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
-
-        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult_sse", elapsedTime, verify_result[verify_ok]);
-        if (!verify_ok)
-            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+        printf("[2] 使用 tiling 分块技术的纯 C/C++ 代码:\n\n");
 
         /****************************************
          *     matmult_s_row_tiling_MxK_N()     *
@@ -2891,6 +2860,48 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
 
     // 所有SSEx(分块)的测试
     if ((test_func_mask & TEST_FUNC_MASK_SSEX_TILING) != 0) {
+
+        printf("[3] 使用 tiling 分块技术和使用 SSEx 指令优化:\n\n");
+
+        /*********************************
+         *     serial_matmult_sse()      *
+         *********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        serial_matmult_sse(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult_sse", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /**********************************
+         *     matrix_fast_matmult()      *
+         **********************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matrix_fast_matmult(M, K, N, A, B, C3);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+#if MATRIX_AB_NEED_TRANSPOSE
+        printf("[%-38s]  time: %8.2f ms\n\n", "matrix_fast_matmult: Step1", elapsedTime1);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult: Step2", elapsedTime, verify_result[verify_ok]);
+#else
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matrix_fast_matmult", elapsedTime, verify_result[verify_ok]);
+#endif  /* MATRIX_AB_NEED_TRANSPOSE */
+
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
         /*******************************************
          *     matrix_fast_matmult_sse2_4x2()      *

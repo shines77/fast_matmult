@@ -77,6 +77,28 @@ void set_crtdbg_env()
 #endif  /* USE_CRTDBG_CHECK */
 }
 
+static size_t __cdecl _next_power_of_2(size_t x)
+{
+#if 1
+    if (x == 0)
+        return 0;
+    // ms1b
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return ++x;
+#else
+    size_t ms1b = 1;
+    while (ms1b < x)
+        ms1b <<= 1;
+
+    return ms1b;
+#endif
+}
+
 int get_user_choice(char *display_text, char *tips_format_text_,
                     int min_value, int max_value, int default_value)
 {
@@ -133,7 +155,7 @@ int get_user_choice(char *display_text, char *tips_format_text_,
     return input_value;
 }
 
-int get_routine_mode()
+int get_routine_mode(int default_value)
 {
     int lang_id = get_current_langid();
 
@@ -153,7 +175,7 @@ int get_routine_mode()
         ""
         "Please input your choice and press enter key to continue...\n\n";
 
-    char tips_format_text[] = "Your choice is: [exit = %d]: ? ";
+    char tips_format_text[] = "Your choice is: [%d = exit]: ? ";
 #else
     char display_text[] =
         "请选择你要运行的模式:\n\n"
@@ -170,10 +192,10 @@ int get_routine_mode()
         ""
         "请输入您的选择并以回车键结束...\n\n";
 
-    char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
+    char tips_format_text[] = "您的选择是: [%d = 退出]: ? ";
 #endif
 
-    return get_user_choice(display_text, tips_format_text, 0, 6, 3);
+    return get_user_choice(display_text, tips_format_text, 0, 6, default_value);
 }
 
 /* 预热时间至少要大于500毫秒, 如果还不够, 可以自行增加最小预热时间 */
@@ -205,41 +227,51 @@ void iso_cpu_warm_up()
 
 void set_thread_affinity()
 {
-    printf("\n");
+    bool echo = false;
+    if (echo)
+        printf("\n");
     HANDLE hCurrentProcess = GetCurrentProcess();
     DWORD dwProcessAffinity = 0, dwSystemAffinity = 0;
-    DWORD dwAffinityMask = SetCPUAffinityMask4(0, 0, 0, 1);
+    DWORD dwAffinityMask = SetCPUAffinityMask4(1, 0, 0, 0);
     BOOL bAffResult;
     bAffResult = GetProcessAffinityMask(hCurrentProcess, &dwProcessAffinity, &dwSystemAffinity);
     if (bAffResult) {
-        if (dwProcessAffinity != dwSystemAffinity)
-            printf("This process can not utilize all processors.\n");
+        if (dwProcessAffinity != dwSystemAffinity) {
+            if (echo)
+                printf("This process can not utilize all processors.\n");
+        }
 
         while ((dwAffinityMask != 0) && (dwAffinityMask <= dwProcessAffinity)) {
             // Check to make sure we can utilize this processsor first.
             if ((dwAffinityMask & dwProcessAffinity) != 0) {
                 bAffResult = SetProcessAffinityMask(hCurrentProcess, dwAffinityMask);
                 if (bAffResult) {
+                    // Wait for the process affinity effected
                     Sleep(0);
                     //
-                    printf("SetProcessAffinityMask(): dwAffinityMask = 0x%08X\n", dwAffinityMask);
+                    if (echo)
+                        printf("SetProcessAffinityMask(): dwAffinityMask = 0x%08X\n", dwAffinityMask);
                     DWORD dwProcessAffinityNew = 0;
                     bAffResult = GetProcessAffinityMask(hCurrentProcess, &dwProcessAffinityNew, &dwSystemAffinity);
                     if (dwProcessAffinityNew == dwAffinityMask) {
-                        printf("SetProcessAffinityMask(): Success.\n");
+                        if (echo)
+                            printf("SetProcessAffinityMask(): Success.\n");
                         bAffResult = SetThreadAffinityMask(GetCurrentThread(), dwAffinityMask);
+                        Sleep(0);
                         break;
                     }
                 }
             }
         }
     }
-    printf("\n");
+    if (echo)
+        printf("\n");
 }
 
 int main(int argc, char *argv[])
 {
-    unsigned int M, N, K;
+    unsigned int M, N, K, n = 1024;
+    bool echo = false;
     int routine_mode = 0;
 
     int lcid, lang_id;
@@ -247,28 +279,57 @@ int main(int argc, char *argv[])
     lcid = get_user_locale_id();
     lang_id = set_current_langid(LANG_USER);
 
-    M = 256; N = 256; K = 256;
-    //M = 512; N = 512; K = 512;
-    M = 1024; N = 1024; K = 1024;
-    //M = 2048; N = 2048; K = 2048;
-    //M = 512; N = 1024; K = 256;
-
     // 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题)
     set_crtdbg_env();
 
-    // 设置线程的亲缘性
+    // 设置进程和线程的亲缘性
     set_thread_affinity();
 
     // 获取用户输入的程序运行模式routine_mode
-    routine_mode = 3;
-    //routine_mode = get_routine_mode();
+    //routine_mode = 3;
+    routine_mode = get_routine_mode(6);
     if (routine_mode == GETCH_EXIT_PROGRAM)
         goto _EXIT_MAIN;
+
+#if 1
+
+#if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
+	printf("Please enter the dimension of the matrix: ");
+    printf("[0 = exit]\n");
+    printf("(must be power of 2, for example: 1024, maximum value is 8192.)\n\n");
+#else
+    printf("请输入矩阵的维数: ");
+    printf("[0 = exit]\n");
+    printf("(必须是2的幂次方, 例如: 1024, 最大值为8192.)\n\n");
+#endif
+	printf("Dim = ? ");
+	scanf_s("%u", &n);
+    printf("\n");
+
+	if (n == 0)
+		goto _EXIT_MAIN;
+
+    // n round to power of 2
+    n = _next_power_of_2(n);
+
+    if (n > 8192)
+        n = 8192;
+
+    M = n; N = n; K = n;
+#else
+    //M = 256; N = 256; K = 256;
+    //M = 512; N = 512; K = 512;
+    M = 1024; N = 1024; K = 1024;
+    //M = 2048; N = 2048; K = 2048;
+#endif
+
+    printf("M = %d, N = %d, K = %d\n\n", M, N, K);
 
     int large_pagesize = huge_tlb_get_pagesize();
     int huge_tlb_inited = huge_tlb_init();
     if (huge_tlb_is_inited()) {
-        printf("huge_tlb_init() is ok.\n\n");
+        if (echo)
+            printf("huge_tlb_init() is ok.\n\n");
     }
 
 #if defined(USE_LARGE_PAGES) && (USE_LARGE_PAGES != 0)
@@ -336,8 +397,7 @@ int main(int argc, char *argv[])
 
     matrix_matmult_test(routine_mode, M, K, N);
 
-    huge_tlb_exit();
-
+    huge_tlb_exit(echo);
     printf("\n");
 
 _EXIT_MAIN:

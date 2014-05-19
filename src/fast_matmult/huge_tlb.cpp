@@ -109,16 +109,19 @@ int huge_tlb_init()
     return inited_ok;
 }
 
-void huge_tlb_exit()
+void huge_tlb_exit(int echo)
 {
     if (s_huge_tlb_inited != 0) {
         bool success = true;
         //success = huge_tlb_adjust_token_privilege(SE_LOCK_MEMORY_NAME, FALSE);
         //success = huge_tlb_adjust_token_privilege(_T("SeLockMemoryPrivilege"), FALSE);
-        if (!success)
+        if (!success) {
             huge_tlb_display_error(_T("huge_tlb_exit() failed."), 0);
-        else
-            printf("huge_tlb_exit() suucess.\n");
+        }
+        else {
+            if (echo)
+                printf("huge_tlb_exit() suucess.\n");
+        }
         s_huge_tlb_inited = 0;
     }
 }
