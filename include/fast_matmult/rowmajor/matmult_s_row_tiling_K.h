@@ -8,12 +8,7 @@
 
 #include <stdlib.h>
 
-#if (_WIN32 | _WIN64) && _MSC_VER
-#include <intrin.h>
-#include <xmmintrin.h>
-#include <emmintrin.h>
-#endif
-
+#include <fast_matmult/common_asm.h>
 #include <fast_matmult/fast_matmult.h>
 
 #ifdef __cplusplus
@@ -27,6 +22,13 @@ void matmult_s_row_tiling_NxM_K(
     const float_t *B, const int ldb,
     const float_t beta,
     float_t *C, const int ldc);
+
+// ========================================================================
+
+void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned int N,
+                                       float_t *A, float_t *B, float_t *C);
+
+// ========================================================================
 
 #ifdef __cplusplus
 }

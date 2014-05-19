@@ -205,6 +205,10 @@
 					Name="rowmajor"
 					>
 					<File
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_Misc.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_K.cpp"
 						>
 					</File>
@@ -290,6 +294,10 @@
 				<Filter
 					Name="rowmajor"
 					>
+					<File
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_Misc.h"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K.h"
 						>

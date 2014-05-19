@@ -193,39 +193,6 @@ enum TestFunc_Mask {
     TEST_FUNC_MASK_MAX
 };
 
-void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N);
-
-void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N);
-
-// ========================================================================
-
-void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
-                         float_t *A, float_t *B, float_t *C);
-
-void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
-                                  float_t *A, float_t *B, float_t *C);
-
-// ========================================================================
-
-void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
-                           float_t *A, float_t *B, float_t *C);
-
-void matmult_s_tiling_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
-                               float_t *A, float_t *B, float_t *C);
-
-// ========================================================================
-
-void serial_matmult(unsigned int M, unsigned int K, unsigned int N,
-                    float_t *A, float_t *B, float_t *C);
-
-void serial_matmult_sse(unsigned int M, unsigned int K, unsigned int N,
-                        float_t *A, float_t *B, float_t *C);
-
-// ========================================================================
-
-void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned int N,
-                                       float_t *A, float_t *B, float_t *C);
-
 #ifdef __cplusplus
 }
 #endif
@@ -255,5 +222,9 @@ bool matrix_compare(const float_t *A, const float_t *B, unsigned int M, unsigned
 
 bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
         int *err_nums = NULL, eMatrixItemOrder order = MatItemOrderAsc);
+
+void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N);
+
+void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N);
 
 #endif  /* _FAST_MATMULT_H_ */
