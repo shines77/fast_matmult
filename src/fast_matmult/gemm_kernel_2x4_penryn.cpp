@@ -239,8 +239,8 @@ L11:
 
         ALIGN_16
 L12:
-#if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
-        PREFETCH_C   byte ptr [AA + (PREFETCH_SIZE + 0) * FLOAT_SIZE]
+#if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
+        PREFETCH_A   byte ptr [AA + (PREFETCH_SIZE + 0) * FLOAT_SIZE]
 #endif
 
         //////////////////////////////////////////////

@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <iostream>
 #if _WIN32 || _WIN64
-#include <tchar.h>
+//#include <tchar.h>
 #include <objbase.h>
 #include <mmsystem.h>
 #endif
@@ -228,6 +228,7 @@ void iso_cpu_warm_up()
 void set_thread_affinity()
 {
     bool echo = false;
+#if _WIN32 || _WIN64
     if (echo)
         printf("\n");
     HANDLE hCurrentProcess = GetCurrentProcess();
@@ -266,6 +267,7 @@ void set_thread_affinity()
     }
     if (echo)
         printf("\n");
+#endif
 }
 
 int main(int argc, char *argv[])
@@ -311,6 +313,9 @@ int main(int argc, char *argv[])
 
     // n round to power of 2
     n = _next_power_of_2(n);
+
+    if (n < 64)
+        n = 64;
 
     if (n > 8192)
         n = 8192;
