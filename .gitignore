@@ -53,6 +53,7 @@
 *.layout
 *.depend
 *.sln.old
+*.sln_old
 # *.vcxproj.user
 /Debug
 /Release
