@@ -49,12 +49,12 @@ void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
             B_ = &B[k_start * ldb + n];
             //C_ = &C[m * ldc + n];
 
-            C_m_n = (float_t)0.0;
+            C_m_n = C[m * ldc + n];
 
             // ×îÄÚ²ãÑ­»·: k
             for (k = k_start; k < k_end; ++k) {
                 // C[m, n] += A[m, k] * B[k, n];
-                //C[m * ldc + n] += A_m_k * B[k * ldb + n];
+                //C_m_n += A[m * K + k] * B[k * N + n];
                 C_m_n += (*A_++) * (*B_);
                 B_ += ldb;
             }
@@ -142,9 +142,11 @@ void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned 
                         A_ = &A[m * K + k_start];
                         B_ = &B[n * K + k_start];
                         //C_ = &C[m * N + n];
+                        /*
                         if (k_step >= K)
                             C_m_n = (float_t)0.0;
                         else
+                        //*/
                             C_m_n = C[m * N + n];
                         //_mm_prefetch((char *)A_, _MM_HINT_NTA);
                         //_mm_prefetch((char *)B_, _MM_HINT_NTA);
