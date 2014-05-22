@@ -23,6 +23,10 @@
 
 #ifndef _COMMON_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _ASSEMBLER_
     #ifdef QUAD_PRECISION
         typedef struct {
@@ -61,6 +65,10 @@
         #define INT_SIZE        4
     #endif
 #endif  /* _ASSEMBLER_ */
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef USE_XDOUBLE
     #define FLOAT_T             xdouble

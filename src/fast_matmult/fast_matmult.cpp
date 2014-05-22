@@ -13,16 +13,16 @@
 // TODO: xmm and emm header files
 #endif
 
-#include "fast_matmult/fast_matmult.h"
-#include "fast_matmult/common_asm.h"
-#include "fast_matmult/stop_watch.h"
-#include "fast_matmult/huge_tlb.h"
+#include <fast_matmult/fast_matmult.h>
+#include <fast_matmult/common_asm.h>
+#include <fast_matmult/stop_watch.h>
+#include <fast_matmult/huge_tlb.h>
 
-#include "fast_matmult/rowmajor/matmult_s_row_X.h"
-#include "fast_matmult/rowmajor/matmult_s_row_Misc.h"
-#include "fast_matmult/rowmajor/matmult_s_row_tiling_K.h"
-#include "fast_matmult/rowmajor/matmult_s_row_tiling_N.h"
-#include "fast_matmult/colmajor/matmult_s_col_X.h"
+#include <fast_matmult/rowmajor/matmult_s_row_X.h>
+#include <fast_matmult/rowmajor/matmult_s_row_Misc.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_K.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_N.h>
+#include <fast_matmult/colmajor/matmult_s_col_X.h>
 
 using namespace annlab;
 
@@ -379,7 +379,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     A  = matrix_offset_malloc(M, K, kAlignment, (kAlignment - 256));
     if (A == NULL) {
         // malloc matrix A failure
-        printf("matrix_malloc() matrix A failure.\n");
+        printf("matrix_offset_malloc() matrix A failure.\n");
         goto MATRIX_MULT_EXIT;
     }
 
@@ -387,7 +387,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     B  = matrix_offset_malloc(K, N, kAlignment, (kAlignment - 128));
     if (B == NULL) {
         // malloc matrix B failure
-        printf("matrix_malloc() matrix B failure.\n");
+        printf("matrix_offset_malloc() matrix B failure.\n");
         goto MATRIX_MULT_EXIT;
     }
 
@@ -395,7 +395,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     C1 = matrix_offset_malloc(M, N, kAlignment);
     if (C1 == NULL) {
         // malloc matrix C1 failure
-        printf("matrix_malloc() matrix C1 failure.\n");
+        printf("matrix_offset_malloc() matrix C1 failure.\n");
         goto MATRIX_MULT_EXIT;
     }
 
@@ -403,7 +403,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     C2 = matrix_offset_malloc(M, N, kAlignment);
     if (C2 == NULL) {
         // malloc matrix C2 failure
-        printf("matrix_malloc() matrix C2 failure.\n");
+        printf("matrix_offset_malloc() matrix C2 failure.\n");
         goto MATRIX_MULT_EXIT;
     }
 
@@ -411,7 +411,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     C3 = matrix_offset_malloc(M, N, kAlignment);
     if (C3 == NULL) {
         // malloc matrix C failure
-        printf("matrix_malloc() matrix C3 failure.\n");
+        printf("matrix_offset_malloc() matrix C3 failure.\n");
         goto MATRIX_MULT_EXIT;
     }
 
@@ -419,7 +419,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     C4 = matrix_offset_malloc(M, N, kAlignment);
     if (C4 == NULL) {
         // malloc matrix C failure
-        printf("matrix_malloc() matrix C4 failure.\n");
+        printf("matrix_offset_malloc() matrix C4 failure.\n");
         goto MATRIX_MULT_EXIT;
     }
 #else
@@ -772,9 +772,9 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
-        /************************************************
+        /*****************************************
          *     matmult_s_row_tiling_NxM_K()      *
-         ************************************************/
+         *****************************************/
         matrix_init_elements(C4, M, N, MatInitZeros);
 
         stopWatch.start();

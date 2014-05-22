@@ -23,6 +23,10 @@
 
 #endif  /* (_WIN32 || _WIN64) && _MSC_VER */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _ASSEMBLER_
     #ifdef QUAD_PRECISION
         typedef struct {
@@ -118,5 +122,9 @@ enum MM_VT_KEYBOARDS {
 
 #define GETCH_DEFUALT_VALUE     (-1)
 #define GETCH_EXIT_PROGRAM      (0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* _COMMON_H_  */

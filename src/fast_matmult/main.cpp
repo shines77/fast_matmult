@@ -205,7 +205,7 @@ void iso_cpu_warm_up()
     stop_watch sw;
     volatile int sum = 0;
     double elapsedTime = 0.0;
-    printf("CPU warm up start ...\n");
+    printf("CPU warm up start ...%d, %d\n");
     do {
         sw.restart();
         // 如果有聪明的编译器能发现这是一个固定值就牛比了, 应该没有

@@ -39,12 +39,11 @@
 ///
 /// </comment>
 
-
-#include <fast_matmult/huge_TLB.h>
-
+#include <stdio.h>
 #include <windows.h>
 #include <tchar.h>
-#include <stdio.h>
+
+#include <fast_matmult/huge_TLB.h>
 
 typedef int (* pfn_GetLargePageMinimum)(void);
 

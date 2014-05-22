@@ -245,6 +245,94 @@ void serial_matmult_sse(unsigned int M, unsigned int K, unsigned int N,
 #endif
 }
 
+#define L1_DCACHE_LINESIZE      64
+#define STEP                    (L1_DCACHE_LINESIZE / sizeof(float_t))
+
+void matmult_s_tiling_sse2_0(unsigned int M, unsigned int K, unsigned int N,
+                             float_t *A, float_t *B, float_t *C)
+{
+    unsigned int m, n, k;
+    unsigned int m2, n2, k2;
+    //unsigned int m_step, n_step, k_step;
+    float_t *mul1, *mul2, *res;
+    float_t *RESTRICT rres;
+    float_t *RESTRICT rmul1;
+    float_t *RESTRICT rmul2;
+
+    mul1 = A;
+    mul2 = B;
+    res  = C;
+
+    for (m = 0; m < M; m += STEP) {
+        for (n = 0; n < N; n += STEP) {
+            for (k = 0; k < K; k += STEP) {
+                for (m2 = 0, rres = &res[m * N + n], rmul1 = &mul1[m * K + k]; m2 < STEP; ++m2, rres += N, rmul1 += K) {
+                    _mm_prefetch((char *)&rmul1[8], _MM_HINT_NTA);
+                    for (k2 = 0, rmul2 = &mul2[k * N + n]; k2 < STEP; ++k2, rmul2 += N) {
+                        __m128d m1d = _mm_load_sd(&rmul1[k2]);
+                        m1d = _mm_unpacklo_pd(m1d, m1d);
+                        for (n2 = 0; n2 < STEP; n2 += 2) {
+                            __m128d m2 = _mm_load_pd(&rmul2[n2]);
+                            __m128d r2 = _mm_load_pd(&rres[n2]);
+                            _mm_store_pd(&rres[n2], _mm_add_pd(_mm_mul_pd(m2, m1d), r2));
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void matmult_s_tiling_sse2_1(unsigned int M, unsigned int K, unsigned int N,
+                             float_t *A, float_t *B, float_t *C)
+{
+    unsigned int m, n, k;
+    unsigned int m2, n2, k2;
+    unsigned int m_step, n_step, k_step;
+    float_t *mul1, *mul2, *res;
+    float_t *RESTRICT rres;
+    float_t *RESTRICT rmul1;
+    float_t *RESTRICT rmul2;
+
+    mul1 = A;
+    mul2 = B;
+    res  = C;
+
+    m_step = 8;
+    k_step = 64;
+    n_step = 512;
+
+    if (m_step > M)
+        m_step = M;
+    if (k_step > K)
+        k_step = K;
+    if (n_step > N)
+        n_step = N;
+
+    for (m = 0; m < M; m += m_step) {
+        for (n = 0; n < N; n += n_step) {
+            for (k = 0; k < K; k += k_step) {
+                for (m2 = 0, rres = &res[m * N + n], rmul1 = &mul1[m * K + k]; m2 < m_step; ++m2, rres += N, rmul1 += K) {
+                    _mm_prefetch((char *)&rmul1[8], _MM_HINT_NTA);
+                    for (k2 = 0, rmul2 = &mul2[k * N + n]; k2 < k_step; ++k2, rmul2 += N) {
+                        __m128d m1d = _mm_load_sd(&rmul1[k2]);
+                        m1d = _mm_unpacklo_pd(m1d, m1d);
+                        for (n2 = 0; n2 < n_step; n2 += 2) {
+                            if ((n2 & 0x00000007UL) == 0) {
+                                _mm_prefetch((char *)&rmul2[n2 + 8], _MM_HINT_NTA);
+                                _mm_prefetch((char *)&rres[n2 + 8],  _MM_HINT_NTA);
+                            }
+                            __m128d m2 = _mm_load_pd(&rmul2[n2]);
+                            __m128d r2 = _mm_load_pd(&rres[n2]);
+                            _mm_store_pd(&rres[n2], _mm_add_pd(_mm_mul_pd(m2, m1d), r2));
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
                            float_t *A, float_t *B, float_t *C)
 {
@@ -306,94 +394,6 @@ void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
                             m2 = _mm_load_pd(&rmul2[n2 + 6]);
                             r2 = _mm_load_pd(&rres[n2 + 6]);
                             _mm_store_pd(&rres[n2 + 6], _mm_add_pd(_mm_mul_pd(m2, m1d), r2));
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void matmult_s_tiling_sse2_1(unsigned int M, unsigned int K, unsigned int N,
-                             float_t *A, float_t *B, float_t *C)
-{
-    unsigned int m, n, k;
-    unsigned int m2, n2, k2;
-    unsigned int m_step, n_step, k_step;
-    float_t *mul1, *mul2, *res;
-    float_t *RESTRICT rres;
-    float_t *RESTRICT rmul1;
-    float_t *RESTRICT rmul2;
-
-    mul1 = A;
-    mul2 = B;
-    res  = C;
-
-    m_step = 8;
-    k_step = 64;
-    n_step = 512;
-
-    if (m_step > M)
-        m_step = M;
-    if (k_step > K)
-        k_step = K;
-    if (n_step > N)
-        n_step = N;
-
-    for (m = 0; m < M; m += m_step) {
-        for (n = 0; n < N; n += n_step) {
-            for (k = 0; k < K; k += k_step) {
-                for (m2 = 0, rres = &res[m * N + n], rmul1 = &mul1[m * K + k]; m2 < m_step; ++m2, rres += N, rmul1 += K) {
-                    _mm_prefetch((char *)&rmul1[8], _MM_HINT_NTA);
-                    for (k2 = 0, rmul2 = &mul2[k * N + n]; k2 < k_step; ++k2, rmul2 += N) {
-                        __m128d m1d = _mm_load_sd(&rmul1[k2]);
-                        m1d = _mm_unpacklo_pd(m1d, m1d);
-                        for (n2 = 0; n2 < n_step; n2 += 2) {
-                            if ((n2 & 0x00000007UL) == 0) {
-                                _mm_prefetch((char *)&rmul2[n2 + 8], _MM_HINT_NTA);
-                                _mm_prefetch((char *)&rres[n2 + 8],  _MM_HINT_NTA);
-                            }
-                            __m128d m2 = _mm_load_pd(&rmul2[n2]);
-                            __m128d r2 = _mm_load_pd(&rres[n2]);
-                            _mm_store_pd(&rres[n2], _mm_add_pd(_mm_mul_pd(m2, m1d), r2));
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-#define L1_DCACHE_LINESIZE      64
-#define STEP                    (L1_DCACHE_LINESIZE / sizeof(float_t))
-
-void matmult_s_tiling_sse2_0(unsigned int M, unsigned int K, unsigned int N,
-                             float_t *A, float_t *B, float_t *C)
-{
-    unsigned int m, n, k;
-    unsigned int m2, n2, k2;
-    //unsigned int m_step, n_step, k_step;
-    float_t *mul1, *mul2, *res;
-    float_t *RESTRICT rres;
-    float_t *RESTRICT rmul1;
-    float_t *RESTRICT rmul2;
-
-    mul1 = A;
-    mul2 = B;
-    res  = C;
-
-    for (m = 0; m < M; m += STEP) {
-        for (n = 0; n < N; n += STEP) {
-            for (k = 0; k < K; k += STEP) {
-                for (m2 = 0, rres = &res[m * N + n], rmul1 = &mul1[m * K + k]; m2 < STEP; ++m2, rres += N, rmul1 += K) {
-                    _mm_prefetch((char *)&rmul1[8], _MM_HINT_NTA);
-                    for (k2 = 0, rmul2 = &mul2[k * N + n]; k2 < STEP; ++k2, rmul2 += N) {
-                        __m128d m1d = _mm_load_sd(&rmul1[k2]);
-                        m1d = _mm_unpacklo_pd(m1d, m1d);
-                        for (n2 = 0; n2 < STEP; n2 += 2) {
-                            __m128d m2 = _mm_load_pd(&rmul2[n2]);
-                            __m128d r2 = _mm_load_pd(&rres[n2]);
-                            _mm_store_pd(&rres[n2], _mm_add_pd(_mm_mul_pd(m2, m1d), r2));
                         }
                     }
                 }

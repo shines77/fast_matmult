@@ -27,6 +27,10 @@
 #define FLOAT_EPSINON_TEST      (0.08f)
 #define DOUBLE_EPSINON_TEST     (0.05)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(ANNLAB_USE_DOUBLE) && (ANNLAB_USE_DOUBLE != 0)
     #ifndef FLOAT_T
         #define FLOAT_T             double
@@ -41,6 +45,10 @@
     #define FLOAT_T_EPSILON         FLOAT_EPSINON
     #define FLOAT_T_EPSINON_TEST    FLOAT_EPSINON_TEST
     typedef float float_t;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #define DEFAULT_CACHELINE   128
