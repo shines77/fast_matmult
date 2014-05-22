@@ -17,12 +17,19 @@
 #include <fast_matmult/common_asm.h>
 #include <fast_matmult/stop_watch.h>
 #include <fast_matmult/huge_tlb.h>
+#include <fast_matmult/aligned_malloc.h>
 
 #include <fast_matmult/rowmajor/matmult_s_row_X.h>
 #include <fast_matmult/rowmajor/matmult_s_row_Misc.h>
 #include <fast_matmult/rowmajor/matmult_s_row_tiling_K.h>
 #include <fast_matmult/rowmajor/matmult_s_row_tiling_N.h>
 #include <fast_matmult/colmajor/matmult_s_col_X.h>
+
+#if 1
+#define _aligned_malloc             iso_aligned_malloc
+#define _aligned_offset_malloc      iso_aligned_offset_malloc
+#define _aligned_free               iso_aligned_free
+#endif
 
 using namespace annlab;
 

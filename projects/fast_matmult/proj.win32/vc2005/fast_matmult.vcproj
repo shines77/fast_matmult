@@ -6,7 +6,6 @@
 	ProjectGUID="{818FA8D6-A667-4144-936E-8FF7395C0871}"
 	RootNamespace="fast_matmult"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -64,7 +63,6 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\..\..\..\lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;..\..\..\..\lib;..\..\..\..\deps;&quot;$(SolutionDir)lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;&quot;$(SolutionDir)lib&quot;;&quot;$(SolutionDir)deps&quot;;&quot;.\lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;.\lib;.\deps;&quot;$(ProjectDir)lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;&quot;$(ProjectDir)lib&quot;;&quot;$(ProjectDir)deps&quot;"
-				UACExecutionLevel="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -86,6 +84,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -140,7 +141,6 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\..\..\..\lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;..\..\..\..\lib;..\..\..\..\deps;&quot;$(SolutionDir)lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;&quot;$(SolutionDir)lib&quot;;&quot;$(SolutionDir)deps&quot;;&quot;.\lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;.\lib;.\deps;&quot;$(ProjectDir)lib\$(MsvcPlatformToolset)\$(MsvcPlatformShortName)&quot;;&quot;$(ProjectDir)lib&quot;;&quot;$(ProjectDir)deps&quot;"
-				UACExecutionLevel="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -166,6 +166,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -178,6 +181,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\..\..\..\src\fast_matmult\aligned_malloc.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\..\src\fast_matmult\fast_matmult.cpp"
 				>
@@ -252,6 +259,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\..\include\fast_matmult\aligned_malloc.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\..\include\fast_matmult\common.h"
 				>
