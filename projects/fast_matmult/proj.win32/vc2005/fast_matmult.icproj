@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="gb2312"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="fast_matmult"
+	ProjectGUID="{1BA37656-1BAA-46F6-AFA6-D6EF1A7C02AF}"
+	VCNestedProjectGUID="{818FA8D6-A667-4144-936E-8FF7395C0871}"
+	VCNestedProjectFileName="fast_matmult.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>
