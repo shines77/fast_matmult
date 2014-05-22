@@ -10,6 +10,7 @@
 
 #include <fast_matmult/common_asm.h>
 #include <fast_matmult/fast_matmult.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_K_sse2.h>
 
 #ifdef __cplusplus
 extern "C" {

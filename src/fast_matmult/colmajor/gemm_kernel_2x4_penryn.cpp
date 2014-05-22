@@ -365,6 +365,8 @@ L12:
         addpd   xmm5, xmm1
         movaps  xmm1, xmmword ptr [BB + 16 * FLOAT_SIZE]
         addpd   xmm4, xmm1
+        // BB += 32 * FLOAT_SIZE;
+        sub     BB, -32 * FLOAT_SIZE
         pshufd  xmm2, xmm3, 0x4e
         mulpd   xmm3, xmm0
         mulpd   xmm2, xmm0
@@ -1511,12 +1513,12 @@ L999:
 
 // non-windows routine
 void __CDECL
-matmult_s_row_tiling_N_sse2_4x1(const int M, const int N, const int K,
-                                const float_t alpha,
-                                const float_t *A, const int lda,
-                                const float_t *B, const int ldb,
-                                const float_t beta,
-                                float_t *C, const int ldc)
+gemm_kernel_2x4_penryn(const int M, const int N, const int K,
+                       const float_t alpha,
+                       const float_t *A, const int lda,
+                       const float_t *B, const int ldb,
+                       const float_t beta,
+                       float_t *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;

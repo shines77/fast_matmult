@@ -812,6 +812,25 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxN_K_transB", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+#if 0
+        /*****************************************************
+         *     matmult_s_row_tiling_MxN_K_transB_sse2()      *
+         *****************************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_MxN_K_transB_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_MxN_K_transB_sse2", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif
     }
 
     // 所有SSEx(分块)的测试

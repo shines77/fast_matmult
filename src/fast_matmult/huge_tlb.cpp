@@ -138,18 +138,18 @@ int huge_tlb_get_pagesize()
         return -1;
     }
 
-    pGetLargePageMinimum = (pfn_GetLargePageMinimum)GetProcAddress(hDll, "GetLargePageMinimum");
+    pGetLargePageMinimum = (pfn_GetLargePageMinimum)::GetProcAddress(hDll, "GetLargePageMinimum");
     if (pGetLargePageMinimum == NULL) {
         huge_tlb_display_error(_T("GetProcAddress"), ::GetLastError());
         if (hDll)
-            FreeLibrary(hDll);
+            ::FreeLibrary(hDll);
         return -2;
     }
 
     pagesize = (*pGetLargePageMinimum)();
 
     if (hDll)
-        FreeLibrary(hDll);
+        ::FreeLibrary(hDll);
     return pagesize;
 }
 

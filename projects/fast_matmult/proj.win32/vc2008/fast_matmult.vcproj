@@ -217,6 +217,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_K_sse2.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N.cpp"
 						>
 					</File>
@@ -308,6 +312,10 @@
 					</File>
 					<File
 						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K_sse2.h"
 						>
 					</File>
 					<File
