@@ -1,4 +1,5 @@
 
+#include <fast_matmult/iacaMarks.h>
 #include <fast_matmult/rowmajor/matmult_s_row_tiling_N_sse2_2x4.h>
 
 #define LDA     ecx
@@ -385,6 +386,9 @@ L01:
 
             n = (n_end - n_start);
 
+            // for Intel Architecture Code Analyzer 2.1
+            IACA_START
+
             __asm {
                 push        edi
                 push        esi
@@ -578,6 +582,10 @@ L01:
                 pop         esi
                 pop         edi
             }
+
+            // for Intel Architecture Code Analyzer 2.1
+            IACA_END
+
         } while (0);
 
         TILING_INNER_LOOP_END_EX();
