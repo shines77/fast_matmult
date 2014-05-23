@@ -978,6 +978,23 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 #endif  /* matmult_s_row_tiling_N_sse2_4x1() */
 
+        /*********************************************
+         *     matmult_s_row_tiling_NxM_K_sse2()     *
+         *********************************************/
+        matrix_init_elements(C4, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_NxM_K_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
+
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_NxM_K_sse2", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
         /*************************************
          *     gemm_kernel_2x4_penryn()      *
          *************************************/

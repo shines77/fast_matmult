@@ -180,7 +180,7 @@ void matmult_s_row_tiling_KxM_N_sse2_2x4(const int M, const int N, const int K,
 
         TILING_INNER_LOOP_END_EX();
 
-#elif !defined(USE_INSTRUCTION_REORDER) || (USE_INSTRUCTION_REORDER == 0)
+#elif 0
 
         // ÄÚ²ãÑ­»·Ë³Ðò: k, m - n
         TILING_INNER_LOOP_BEGIN_EX(k, m, 4, 2);
