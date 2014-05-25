@@ -15,8 +15,10 @@ using namespace annlab;
 #define BB      edi
 #define CC      edx
 
-#define B1      edi
-#define B2      edx
+#define B0      edi
+#define B1      eax
+
+#define LDB_X4  CC
 
 #define KK      eax
 
@@ -122,7 +124,7 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
 
     ///*
     // 430.xx ms
-    m_step = 64;
+    m_step = 256;
     k_step = 128;
     n_step = 512;
     //*/
@@ -143,8 +145,8 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
 
     // ·Ö¿éÍâ²ãÑ­»·Ë³Ðò: K, M, N
     //TILING_OUTER_LOOP_BEGIN(k, m, n);
-    //TILING_OUTER_LOOP_BEGIN(n, m, k);
-    TILING_OUTER_LOOP_BEGIN(m, n, k);
+    TILING_OUTER_LOOP_BEGIN(n, m, k);
+    //TILING_OUTER_LOOP_BEGIN(m, n, k);
 
 #if 0
         // ÄÚ²ãÑ­»·Ë³Ðò: n, m - k
@@ -196,19 +198,22 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
                 ///////////////////////////////////////////////////////////
 
                 mov         AA, A_
-                mov         BB, B_
+                //mov         BB, B_
                 //mov         CC, C_
 
                 mov         LDA, lda
                 mov         LDB, ldb
 
+                mov         B0, B_
                 //mov         B1, B_
-                //mov         B2, B_
 
                 lea         LDA, [LDA * FLOAT_SIZE]
                 lea         LDB, [LDB * FLOAT_SIZE]
 
-                //add         B2, LDB
+                mov         LDB_X4, LDB
+                //add         B1, LDB
+                
+                sal         LDB_X4, 2
 
                 //mov         KK, k
 
@@ -228,6 +233,8 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
 #endif
 
 #if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
+                mov         CC, C_
+
                 // eax = CC + LDC * 2; C[2, 0]
                 lea     eax, [CC + LDC * 2]
 
@@ -260,6 +267,7 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
                 mov     KK, k
                 // KK = K / 8
                 sar     KK, 3
+                mov     k, KK
                 je      L15
 
                 ALIGN_16
@@ -297,13 +305,14 @@ L12:
                 ///////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////
 
+                mov         B1, B0
 #if 1
                 movaps      xmm0, xmmword ptr [AA +       0 * FLOAT_SIZE]
                 pshufd      xmm0, xmm0, 0x44
                 movaps      xmm1, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0x44
 
-                movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [B0 +       0 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 #endif
 
@@ -315,13 +324,15 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB +       2 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [B0 +       2 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 // CC2 = BB1 * AA0
                 mulpd       xmm2, xmm0
                 // CC3 = BB1 * AA1
                 mulpd       xmm3, xmm1
+
+                add         B1, LDB
 
                 addpd       xmm6, xmm2
                 addpd       xmm7, xmm3
@@ -333,7 +344,7 @@ L12:
                 movaps      xmm1, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0xee
 
-                movapd      xmm2, xmmword ptr [BB + LDB + 0 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [B1 +       0 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 // CC4 = BB2 * AA2
@@ -344,7 +355,7 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB + LDB + 2 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [B1 +       2 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 // CC6 = BB3 * AA2
@@ -362,7 +373,7 @@ L12:
                 movaps      xmm1, xmmword ptr [AA + LDA + 2 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0x44
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [B0 + LDB * 2 + 0 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -371,7 +382,7 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [B0 + LDB * 2 + 2 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -382,32 +393,36 @@ L12:
 
                 //////////////////////////////////
 
-                add         BB, LDB
+                //add         BB, LDB
 
                 movaps      xmm0, xmmword ptr [AA +       2 * FLOAT_SIZE]
                 pshufd      xmm0, xmm0, 0xee
                 movaps      xmm1, xmmword ptr [AA + LDA + 2 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0xee
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]   ; LDB * 3
+                movapd      xmm2, xmmword ptr [B1 + LDB * 2 + 0 * FLOAT_SIZE]   ; LDB * 3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
+
+                add         B0, LDB_X4
 
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 3
+                movapd      xmm2, xmmword ptr [B1 + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
+                add         B1, LDB_X4
+
                 addpd       xmm6, xmm2
                 addpd       xmm7, xmm3
 
-                sub         BB, LDB
+                //sub         BB, LDB
 
                 ///////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////
@@ -415,10 +430,10 @@ L12:
                 movaps      xmm0, xmmword ptr [AA +       4 * FLOAT_SIZE]
                 pshufd      xmm0, xmm0, 0x44
                 movaps      xmm1, xmmword ptr [AA + LDA + 4 * FLOAT_SIZE]
-                lea         BB, [BB + LDB * 4]
+                //lea         BB, [BB + LDB * 4]
                 pshufd      xmm1, xmm1, 0x44
 
-                movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]   ; LDB * 4
+                movapd      xmm2, xmmword ptr [B0 +       0 * FLOAT_SIZE]   ; LDB * 4
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -427,7 +442,7 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB +       2 * FLOAT_SIZE]   ; LDB * 4
+                movapd      xmm2, xmmword ptr [B0 +       2 * FLOAT_SIZE]   ; LDB * 4
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -443,7 +458,7 @@ L12:
                 movaps      xmm1, xmmword ptr [AA + LDA + 4 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0xee
 
-                movapd      xmm2, xmmword ptr [BB + LDB + 0 * FLOAT_SIZE]   ; LDB * 5
+                movapd      xmm2, xmmword ptr [B1 +       0 * FLOAT_SIZE]   ; LDB * 5
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -452,7 +467,7 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB + LDB + 2 * FLOAT_SIZE]   ; LDB * 5
+                movapd      xmm2, xmmword ptr [B1 +       2 * FLOAT_SIZE]   ; LDB * 5
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -468,7 +483,7 @@ L12:
                 movaps      xmm1, xmmword ptr [AA + LDA + 6 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0x44
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]   ; LDB * 6
+                movapd      xmm2, xmmword ptr [B0 + LDB * 2 + 0 * FLOAT_SIZE]   ; LDB * 6
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -477,7 +492,7 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 6
+                movapd      xmm2, xmmword ptr [B0 + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 6
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -488,14 +503,14 @@ L12:
 
                 //////////////////////////////////
 
-                add         BB, LDB
+                //add         BB, LDB
 
                 movaps      xmm0, xmmword ptr [AA +       6 * FLOAT_SIZE]
                 pshufd      xmm0, xmm0, 0xee
                 movaps      xmm1, xmmword ptr [AA + LDA + 6 * FLOAT_SIZE]
                 pshufd      xmm1, xmm1, 0xee
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 0 * FLOAT_SIZE]   ; LDB * 7
+                movapd      xmm2, xmmword ptr [B1 + LDB * 2 + 0 * FLOAT_SIZE]   ; LDB * 7
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -504,10 +519,9 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                //lea         CC, [LDB * 4 + LDB]
-                lea         CC, [LDB * 2 + LDB]
+                //lea         CC, [LDB * 2 + LDB]
 
-                movapd      xmm2, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 7
+                movapd      xmm2, xmmword ptr [B1 + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 7
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -516,9 +530,7 @@ L12:
                 addpd       xmm6, xmm2
                 addpd       xmm7, xmm3
 
-                //sub         BB, LDB
-                //sub         BB, CC
-                add         BB, CC
+                //add         BB, CC
 
 #if 0
                 ///////////////////////////////////////////////////////////////
@@ -538,10 +550,17 @@ L12:
 #endif
 
                 add         AA, 8 * FLOAT_SIZE
+                add         B0, LDB_X4
+                //add         B1, LDB_X4
                 //add         BB, 4 * FLOAT_SIZE
 
                 // KK -= 1;
+                ///*
+                mov         KK, k
                 sub         KK, 1
+                mov         k, KK
+                //*/
+                //dec         k
                 BRANCH
                 jne         L12
 
@@ -617,11 +636,11 @@ L15:
 #endif
 
     //TILING_OUTER_LOOP_END(k, m, n);
-    //TILING_OUTER_LOOP_END(n, m, k);
-    TILING_OUTER_LOOP_END(m, n, k);
+    TILING_OUTER_LOOP_END(n, m, k);
+    //TILING_OUTER_LOOP_END(m, n, k);
 
     __asm {
-        emms
+        //emms
     }
 }
 
