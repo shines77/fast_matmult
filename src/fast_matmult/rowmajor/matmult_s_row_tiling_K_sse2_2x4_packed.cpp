@@ -690,8 +690,8 @@ L12:
                 ///////////////////////////////////////////////////////////////
 #if 1
                 movaps      xmm0, xmmword ptr [AA + 0 * FLOAT_SIZE]
-                punpcklqdq  xmm0, xmm0
                 movaps      xmm1, xmmword ptr [AA + 2 * FLOAT_SIZE]
+                punpcklqdq  xmm0, xmm0
                 punpcklqdq  xmm1, xmm1
 
                 movapd      xmm2, xmmword ptr [BB + 0 * FLOAT_SIZE]
@@ -701,23 +701,21 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 2 * FLOAT_SIZE]
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
-                addpd       xmm6, xmm2
-                addpd       xmm7, xmm3
-
-                //////////////////////////////////
-
                 movaps      xmm0, xmmword ptr [AA + 0 * FLOAT_SIZE]
+                addpd       xmm6, xmm2
                 punpckhqdq  xmm0, xmm0
+                addpd       xmm7, xmm3
                 movaps      xmm1, xmmword ptr [AA + 2 * FLOAT_SIZE]
                 punpckhqdq  xmm1, xmm1
+
+                //////////////////////////////////
 
                 movapd      xmm2, xmmword ptr [BB + 4 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
@@ -726,23 +724,21 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 6 * FLOAT_SIZE]
+                addpd       xmm5, xmm3               
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
-                addpd       xmm6, xmm2
-                addpd       xmm7, xmm3
-
-                ////////////////////////////////////////////////////
-
                 movaps      xmm0, xmmword ptr [AA +  4 * FLOAT_SIZE]
+                addpd       xmm6, xmm2
                 punpcklqdq  xmm0, xmm0
+                addpd       xmm7, xmm3
                 movaps      xmm1, xmmword ptr [AA +  6 * FLOAT_SIZE]
                 punpcklqdq  xmm1, xmm1
+
+                ////////////////////////////////////////////////////
 
                 movapd      xmm2, xmmword ptr [BB +  8 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
@@ -751,23 +747,21 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 10 * FLOAT_SIZE]
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
-                addpd       xmm6, xmm2
-                addpd       xmm7, xmm3
-
-                //////////////////////////////////
-
                 movaps      xmm0, xmmword ptr [AA +  4 * FLOAT_SIZE]
+                addpd       xmm6, xmm2
                 punpckhqdq  xmm0, xmm0
+                addpd       xmm7, xmm3
                 movaps      xmm1, xmmword ptr [AA +  6 * FLOAT_SIZE]
                 punpckhqdq  xmm1, xmm1
+
+                //////////////////////////////////
 
                 movapd      xmm2, xmmword ptr [BB + 12 * FLOAT_SIZE]   ; LDB * 3
                 movapd      xmm3, xmm2
@@ -776,16 +770,19 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 14 * FLOAT_SIZE]   ; LDB * 3
+                addpd       xmm5, xmm3               
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
+                movaps      xmm0, xmmword ptr [AA +  8 * FLOAT_SIZE]
                 addpd       xmm6, xmm2
+                punpcklqdq  xmm0, xmm0
                 addpd       xmm7, xmm3
+                movaps      xmm1, xmmword ptr [AA + 10 * FLOAT_SIZE]
+                punpcklqdq  xmm1, xmm1
 
     #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
                 PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 8) * FLOAT_SIZE]
@@ -794,11 +791,6 @@ L12:
                 ///////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////
 
-                movaps      xmm0, xmmword ptr [AA +  8 * FLOAT_SIZE]
-                punpcklqdq  xmm0, xmm0
-                movaps      xmm1, xmmword ptr [AA + 10 * FLOAT_SIZE]
-                punpcklqdq  xmm1, xmm1
-
                 movapd      xmm2, xmmword ptr [BB + 16 * FLOAT_SIZE]   ; LDB * 4
                 movapd      xmm3, xmm2
 
@@ -806,23 +798,21 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 18 * FLOAT_SIZE]   ; LDB * 4
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
-                addpd       xmm6, xmm2
-                addpd       xmm7, xmm3
-
-                //////////////////////////////////
-
                 movaps      xmm0, xmmword ptr [AA +  8 * FLOAT_SIZE]
+                addpd       xmm6, xmm2
                 punpckhqdq  xmm0, xmm0
+                addpd       xmm7, xmm3
                 movaps      xmm1, xmmword ptr [AA + 10 * FLOAT_SIZE]
                 punpckhqdq  xmm1, xmm1
+
+                //////////////////////////////////
 
                 movapd      xmm2, xmmword ptr [BB + 20 * FLOAT_SIZE]   ; LDB * 5
                 movapd      xmm3, xmm2
@@ -831,23 +821,21 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 22 * FLOAT_SIZE]   ; LDB * 5
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
-                addpd       xmm6, xmm2
-                addpd       xmm7, xmm3
-
-                ////////////////////////////////////////////////////
-
                 movaps      xmm1, xmmword ptr [AA + 12 * FLOAT_SIZE]
+                addpd       xmm6, xmm2
                 punpcklqdq  xmm0, xmm0
+                addpd       xmm7, xmm3
                 movaps      xmm1, xmmword ptr [AA + 14 * FLOAT_SIZE]
                 punpcklqdq  xmm1, xmm1
+
+                ////////////////////////////////////////////////////
 
                 movapd      xmm2, xmmword ptr [BB + 24 * FLOAT_SIZE]   ; LDB * 6
                 movapd      xmm3, xmm2
@@ -856,23 +844,21 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 26 * FLOAT_SIZE]   ; LDB * 6
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
-                addpd       xmm6, xmm2
-                addpd       xmm7, xmm3
-
-                //////////////////////////////////
-
                 movaps      xmm0, xmmword ptr [AA + 12 * FLOAT_SIZE]
+                addpd       xmm6, xmm2
                 punpckhqdq  xmm0, xmm0
+                addpd       xmm7, xmm3
                 movaps      xmm1, xmmword ptr [AA + 14 * FLOAT_SIZE]
                 punpckhqdq  xmm1, xmm1
+
+                //////////////////////////////////
 
                 movapd      xmm2, xmmword ptr [BB + 28 * FLOAT_SIZE]   ; LDB * 7
                 movapd      xmm3, xmm2
@@ -881,13 +867,14 @@ L12:
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
-                addpd       xmm5, xmm3
-
                 movapd      xmm2, xmmword ptr [BB + 30 * FLOAT_SIZE]   ; LDB * 7
+                addpd       xmm5, xmm3                
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
+
+                sub         BB, -32 * FLOAT_SIZE
 
                 addpd       xmm6, xmm2
                 addpd       xmm7, xmm3
@@ -908,8 +895,7 @@ L12:
                 ///////////////////////////////////////////////////////////////
 #endif
 
-                add         AA, 16 * FLOAT_SIZE
-                add         BB, 32 * FLOAT_SIZE
+                sub         AA, -16 * FLOAT_SIZE
 
                 // KK -= 1;
                 sub         KK, 1
