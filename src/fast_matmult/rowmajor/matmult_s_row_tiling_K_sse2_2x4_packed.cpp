@@ -93,21 +93,21 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
     k_step = 128;
     n_step = 512;
 
-    ///*
+    /*
     // 只打开 A(t0)的预读, 317.xx ms
     m_step = 128;
     k_step = 512;
     n_step = 512;
     //*/
 
-    ///*
+    /*
     // 只打开C(t0), A(t0)的预读, 318.xx ms
     m_step = 128;
     k_step = 512;
     n_step = 512;
     //*/
 
-    /*
+    ///*
     // 只打开C(t0), A(t0)的预读, 318.xx ms
     m_step = 256;
     k_step = 512;
@@ -717,13 +717,13 @@ L12:
                 movapd      xmm3, xmm2
 
                 //////////////////////////////////
-                
+
                 mulpd       xmm2, xmm0
                 mulpd       xmm3, xmm1
 
                 addpd       xmm4, xmm2
                 movapd      xmm2, xmmword ptr [BB + 6 * FLOAT_SIZE]
-                addpd       xmm5, xmm3               
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -767,7 +767,7 @@ L12:
 
                 addpd       xmm4, xmm2
                 movapd      xmm2, xmmword ptr [BB + 14 * FLOAT_SIZE]   ; LDB * 3
-                addpd       xmm5, xmm3               
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0
@@ -860,7 +860,7 @@ L12:
 
                 addpd       xmm4, xmm2
                 movapd      xmm2, xmmword ptr [BB + 30 * FLOAT_SIZE]   ; LDB * 7
-                addpd       xmm5, xmm3                
+                addpd       xmm5, xmm3
                 movapd      xmm3, xmm2
 
                 mulpd       xmm2, xmm0

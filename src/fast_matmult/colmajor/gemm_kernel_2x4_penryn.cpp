@@ -171,20 +171,6 @@ L01:
         sar     I, 1
         jle     L20
 
-        // IACA_START
-
-#ifndef IACA_MARKS_OFF
-
-        _emit   0x0F
-        _emit   0x0B
-
-        mov     ebx, 111
-        _emit   0x64
-        _emit   0x67
-        _emit   0x90
-
-#endif  /* IACA_MARKS_OFF */
-
         ALIGN_16
 L11:
 #if !defined(TRMMKERNEL) || \
@@ -253,6 +239,20 @@ L11:
         je      L15
 
         ALIGN_16
+        // IACA_START
+
+#ifndef IACA_MARKS_OFF
+
+        _emit   0x0F
+        _emit   0x0B
+
+        mov     ebx, 111
+        _emit   0x64
+        _emit   0x67
+        _emit   0x90
+
+#endif  /* IACA_MARKS_OFF */
+
 L12:
 #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
         PREFETCH_A   byte ptr [AA + (PREFETCH_SIZE + 0) * FLOAT_SIZE]
