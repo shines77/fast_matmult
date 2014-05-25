@@ -159,6 +159,8 @@ extern "C" {
 #define movapd          movaps
 #endif
 
+#if defined(_MSC_VER)
+
 #ifndef __STDCALL
 #define __STDCALL       __stdcall
 #endif
@@ -175,6 +177,53 @@ extern "C" {
 #ifndef __DEFCALL
 #define __DEFCALL       __CDECL
 #endif
+
+#else
+
+#undef __STDCALL
+#undef __CDECL
+#undef __FASTCALL
+#undef __DEFCALL
+
+#define __STDCALL
+#define __CDECL
+#define __FASTCALL
+#define __DEFCALL
+
+#endif  /* _MSC_VER */
+
+#if defined(__GNUC__)
+
+#ifndef _GCC_STDCALL
+#define _GCC_STDCALL
+#endif
+
+#ifndef _GCC_CDECL
+#define _GCC_CDECL          __attribute__((cdecl))
+#endif
+
+#ifndef _GCC_FASTCALL
+#define _GCC_FASTCALL       __attribute__((fastcall))
+#endif
+
+/* default call: __cdecl */
+#ifndef _GCC_DEFCALL
+#define _GCC_DEFCALL        _GCC_CDECL
+#endif
+
+#else
+
+#undef _GCC_STDCALL
+#undef _GCC_CDECL
+#undef _GCC_FASTCALL
+#undef _GCC_DEFCALL
+
+#define _GCC_STDCALL
+#define _GCC_CDECL
+#define _GCC_FASTCALL
+#define _GCC_DEFCALL
+
+#endif  /* __GNUC__ */
 
 #ifdef  USE_DOUBLE
 #undef  FLOAT_T

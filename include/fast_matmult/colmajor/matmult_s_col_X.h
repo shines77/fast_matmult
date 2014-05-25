@@ -6,8 +6,6 @@
 #pragma once
 #endif
 
-#include <stdlib.h>
-
 #if (_WIN32 | _WIN64) && _MSC_VER
 #include <intrin.h>
 #include <xmmintrin.h>

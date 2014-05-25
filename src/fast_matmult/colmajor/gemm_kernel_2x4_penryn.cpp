@@ -115,7 +115,7 @@ gemm_kernel_2x4_penryn(const int m, const int n, const int k,
                        const float_t *b, const int ldb,
                        const float_t beta,
                        float_t *c, const int ldc,
-                       const int offset)
+                       const int offset) _GCC_CDECL
 {
     __asm {
         sub     esp, ARGS      // # Generate Stack Frame

@@ -6,11 +6,10 @@
 #pragma once
 #endif
 
-#include <stdlib.h>
-
 #include <fast_matmult/common_asm.h>
 #include <fast_matmult/fast_matmult.h>
-#include <fast_matmult/rowmajor/matmult_s_row_tiling_K_sse2.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_K_sse2_2x4.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_K_sse2_2x4_packed.h>
 
 #ifdef __cplusplus
 extern "C" {

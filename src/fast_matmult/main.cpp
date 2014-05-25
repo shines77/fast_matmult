@@ -296,12 +296,12 @@ int main(int argc, char *argv[])
     if (lang_id == LANG_ZH_CN) {
         printf("请输入矩阵的维数: ");
         printf("[0 = exit]\n");
-        printf("(必须是2的幂次方, 例如: 1024, 最大值为8192.)\n\n");
+        printf("(必须是2的幂次方, 例如: 1024, 最大值为8192)\n\n");
     }
     else {
 	    printf("Please enter the dimension of the matrix: ");
         printf("[0 = exit]\n");
-        printf("(must be power of 2, for example: 1024, maximum value is 8192.)\n\n");
+        printf("(must be power of 2, for example: 1024, maximum value is 8192)\n\n");
     }
 
 	printf("Dim = ? ");

@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include <fast_matmult/iacaMarks.h>
-#include <fast_matmult/rowmajor/matmult_s_row_tiling_K_sse2.h>
+#include <fast_matmult/rowmajor/matmult_s_row_tiling_K_sse2_2x4.h>
 #include <fast_matmult/stop_watch.h>
 
 using namespace annlab;
@@ -81,12 +81,12 @@ using namespace annlab;
 #define PREFETCH_SIZE_B     (8 * 17 + 4)
 #endif
 
-void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
-                                     const float_t alpha,
-                                     const float_t *A, const int lda,
-                                     const float_t *B, const int ldb,
-                                     const float_t beta,
-                                     float_t *C, const int ldc)
+void matmult_s_row_tiling_NxM_K_sse2_2x4(const int M, const int N, const int K,
+                                         const float_t alpha,
+                                         const float_t *A, const int lda,
+                                         const float_t *B, const int ldb,
+                                         const float_t beta,
+                                         float_t *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -644,12 +644,12 @@ L15:
     }
 }
 
-void matmult_s_row_tiling_MxN_K_transB_sse2(const int M, const int N, const int K,
-                                            const float_t alpha,
-                                            const float_t *A, const int lda,
-                                            const float_t *B, const int ldb,
-                                            const float_t beta,
-                                            float_t *C, const int ldc)
+void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const int K,
+                                                const float_t alpha,
+                                                const float_t *A, const int lda,
+                                                const float_t *B, const int ldb,
+                                                const float_t beta,
+                                                float_t *C, const int ldc)
 {
     stop_watch sw;
     int m, n, k;

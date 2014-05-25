@@ -978,30 +978,47 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 #endif  /* matmult_s_row_tiling_N_sse2_4x1() */
 
-        /*********************************************
-         *     matmult_s_row_tiling_NxM_K_sse2()     *
-         *********************************************/
+        /*************************************************
+         *     matmult_s_row_tiling_NxM_K_sse2_2x4()     *
+         *************************************************/
         matrix_init_elements(C4, M, N, MatInitZeros);
 
         //matrix_init_elements(A,  M, K, MatInitOrder);
         //matrix_init_elements(B,  K, N, MatInitOrder);
 
         stopWatch.start();
-        matmult_s_row_tiling_NxM_K_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
+        matmult_s_row_tiling_NxM_K_sse2_2x4(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
         stopWatch.stop();
         elapsedTime = stopWatch.getMillisec();
 
         diff_nums = 0;
         verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
-        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_NxM_K_sse2", elapsedTime, verify_result[verify_ok]);
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_NxM_K_sse2_2x4", elapsedTime, verify_result[verify_ok]);
+        if (!verify_ok)
+            printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+
+        /********************************************************
+         *     matmult_s_row_tiling_NxM_K_sse2_2x4_packed()     *
+         ********************************************************/
+        matrix_init_elements(C3, M, N, MatInitZeros);
+
+        stopWatch.start();
+        matmult_s_row_tiling_NxM_K_sse2_2x4_packed(M, N, K, 1.0, A, K, B, N, 0.0, C3, N);
+        stopWatch.stop();
+        elapsedTime = stopWatch.getMillisec();
+
+        diff_nums = 0;
+        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+
+        printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "matmult_s_row_tiling_NxM_K_sse2_2x4_pk", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
         /*************************************
          *     gemm_kernel_2x4_penryn()      *
          *************************************/
-        float_t *C3b = C3;
+        float_t *C3b = C4;
         matrix_init_elements(C3b, M, N, MatInitZeros);
 
         // œ»◊™÷√æÿ’ÛA
@@ -1018,11 +1035,11 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         //matrix_fast_transpose_NxN((float_t *)A, K, M);
         matrix_fast_transpose_NxN((float_t *)B, N, K);
 
-        matrix_fast_transpose_NxN((float_t *)C3, N, M);
+        matrix_fast_transpose_NxN((float_t *)C4, N, M);
 
         //C3 -= M * N;
         diff_nums = 0;
-        verify_ok = matrix_compare(C1, C3, M, N, &diff_nums);
+        verify_ok = matrix_compare(C1, C4, M, N, &diff_nums);
 
         printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "gemm_kernel_2x4_penryn", elapsedTime, verify_result[verify_ok]);
 #if 0
