@@ -99,22 +99,21 @@ static size_t __cdecl _next_power_of_2(size_t x)
 #endif
 }
 
-int get_user_choice(char *display_text, char *tips_format_text_,
+int get_user_choice(int lang_id, char *display_text, char *tips_format_text_,
                     int min_value, int max_value, int default_value)
 {
     const int exit_value    = GETCH_EXIT_PROGRAM;
     int input_value         = GETCH_DEFUALT_VALUE;
     int tmp_value;
 
-#if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
-    char tips_format_text[] = "Your choice is: [exit = %d]: ? ";
-#else
-    char tips_format_text[] = "您的选择是: [退出 = %d]: ? ";
-#endif
+    char *tips_format_text[MAX_LANG_ID];
+
+    tips_format_text[0] = "Your choice is: [exit = %d]: ? ";
+    tips_format_text[1] = "您的选择是: [退出 = %d]: ? ";
 
     printf("%s", display_text);
     if (tips_format_text_ == NULL)
-        printf(tips_format_text, exit_value);
+        printf(tips_format_text[lang_id], exit_value);
     else
         printf(tips_format_text_, exit_value);
     printf("%d", default_value);
@@ -159,8 +158,10 @@ int get_routine_mode(int default_value)
 {
     int lang_id = get_current_langid();
 
-#if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
-    char display_text[] =
+    char *display_text[MAX_LANG_ID];
+    char *tips_format_text[MAX_LANG_ID];
+
+    display_text[0] =
         "Please choice program's routine mode:\n\n"
         ""
         "[1] = Pure C/C++ code   that unused tiling.\n"
@@ -175,9 +176,9 @@ int get_routine_mode(int default_value)
         ""
         "Please input your choice and press enter key to continue...\n\n";
 
-    char tips_format_text[] = "Your choice is: [%d = exit]: ? ";
-#else
-    char display_text[] =
+    tips_format_text[0] = "Your choice is: [%d = exit]: ? ";
+
+    display_text[1] =
         "请选择你要运行的模式:\n\n"
         ""
         "[1] = 不使用 tiling 分块技术的纯 C/C++ 代码.\n"
@@ -192,10 +193,9 @@ int get_routine_mode(int default_value)
         ""
         "请输入您的选择并以回车键结束...\n\n";
 
-    char tips_format_text[] = "您的选择是: [%d = 退出]: ? ";
-#endif
+    tips_format_text[1] = "您的选择是: [%d = 退出]: ? ";
 
-    return get_user_choice(display_text, tips_format_text, 0, 6, default_value);
+    return get_user_choice(lang_id, display_text[lang_id], tips_format_text[lang_id], 0, 6, default_value);
 }
 
 /* 预热时间至少要大于500毫秒, 如果还不够, 可以自行增加最小预热时间 */
@@ -276,9 +276,7 @@ int main(int argc, char *argv[])
     bool echo = false;
     int routine_mode = 0;
 
-    int lcid, lang_id;
-    lcid = get_sys_locale_id();
-    lcid = get_user_locale_id();
+    int lang_id;
     lang_id = set_current_langid(LANG_USER);
 
     // 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题)
@@ -289,7 +287,7 @@ int main(int argc, char *argv[])
 
     // 获取用户输入的程序运行模式routine_mode
     //routine_mode = 3;
-    routine_mode = get_routine_mode(6);
+    routine_mode = get_routine_mode(3);
     if (routine_mode == GETCH_EXIT_PROGRAM)
         goto _EXIT_MAIN;
 

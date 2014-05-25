@@ -14,6 +14,8 @@
 
 #define LANG_ID         LANG_ZH_CN
 
+#define MAX_LANG_ID     2
+
 #ifdef __cplusplus
 extern "C" {
 #endif
