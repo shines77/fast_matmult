@@ -387,7 +387,7 @@ L01:
             n = (n_end - n_start);
 
             // for Intel Architecture Code Analyzer 2.1
-            IACA_START
+            //IACA_START
 
             __asm {
                 push        edi
@@ -412,6 +412,21 @@ L01:
                 mov         NN, n
 
                 ALIGN_16
+
+                // IACA_START
+
+#ifndef IACA_MARKS_OFF
+
+                _emit   0x0F
+                _emit   0x0B
+
+                mov     ebx, 111
+                _emit   0x64
+                _emit   0x67
+                _emit   0x90
+
+#endif  /* IACA_MARKS_OFF */
+
 L01:
     #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
                 PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 0) * FLOAT_SIZE]
@@ -571,7 +586,22 @@ L01:
                 //sub         BB, LDB
                 sub         NN, 4
 
+                BRANCH
                 jg          L01
+
+                // IACA_END
+
+#ifndef IACA_MARKS_OFF
+
+                mov     ebx, 222
+                _emit   0x64
+                _emit   0x67
+                _emit   0x90
+
+                _emit   0x0F
+                _emit   0x0B
+
+#endif  /* IACA_MARKS_OFF */
 
                 ///////////////////////////////////////////////////////////
 
@@ -584,7 +614,7 @@ L01:
             }
 
             // for Intel Architecture Code Analyzer 2.1
-            IACA_END
+            //IACA_END
 
         } while (0);
 

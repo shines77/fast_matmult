@@ -11,9 +11,12 @@ using namespace annlab;
 #define LDB     ebx
 #define LDC     LDB
 
-#define AA      edx
-#define BB      esi
-#define CC      edi
+#define AA      esi
+#define BB      edi
+#define CC      edx
+
+#define B1      edi
+#define B2      edx
 
 #define KK      eax
 
@@ -120,8 +123,8 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
     ///*
     // 430.xx ms
     m_step = 64;
-    k_step = 512;
-    n_step = 256;
+    k_step = 128;
+    n_step = 512;
     //*/
 #endif
 
@@ -180,7 +183,7 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
             k = (k_end - k_start);
 
             // for Intel Architecture Code Analyzer 2.1
-            IACA_START
+            //IACA_START
 
             __asm {
                 push        edi
@@ -199,23 +202,30 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
                 mov         LDA, lda
                 mov         LDB, ldb
 
+                //mov         B1, B_
+                //mov         B2, B_
+
                 lea         LDA, [LDA * FLOAT_SIZE]
                 lea         LDB, [LDB * FLOAT_SIZE]
+
+                //add         B2, LDB
 
                 //mov         KK, k
 
 //                ALIGN_16
-//L01:                
+//L01:
+#if 0
                 movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 //punpcklqdq  xmm2, xmm4
                 //punpckhqdq  xmm3, xmm4
 
-                movaps      xmm6, xmmword ptr [AA +       0 * FLOAT_SIZE]
-                pshufd      xmm0, xmm6, 0x44
-                movaps      xmm7, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
-                pshufd      xmm1, xmm7, 0x44
+                movaps      xmm0, xmmword ptr [AA +       0 * FLOAT_SIZE]
+                pshufd      xmm0, xmm0, 0x44
+                movaps      xmm1, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
+                pshufd      xmm1, xmm1, 0x44
+#endif
 
 #if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
                 // eax = CC + LDC * 2; C[2, 0]
@@ -253,8 +263,22 @@ void matmult_s_row_tiling_NxM_K_sse2(const int M, const int N, const int K,
                 je      L15
 
                 ALIGN_16
-L12:
 
+                // IACA_START
+
+#ifndef IACA_MARKS_OFF
+
+                _emit   0x0F
+                _emit   0x0B
+
+                mov     ebx, 111
+                _emit   0x64
+                _emit   0x67
+                _emit   0x90
+
+#endif  /* IACA_MARKS_OFF */
+
+L12:
     #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
                 PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 0) * FLOAT_SIZE]
     #endif
@@ -272,6 +296,16 @@ L12:
 
                 ///////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////
+
+#if 1
+                movaps      xmm0, xmmword ptr [AA +       0 * FLOAT_SIZE]
+                pshufd      xmm0, xmm0, 0x44
+                movaps      xmm1, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
+                pshufd      xmm1, xmm1, 0x44
+
+                movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+#endif
 
                 // CC0 = BB0 * AA0
                 mulpd       xmm2, xmm0
@@ -470,7 +504,8 @@ L12:
                 addpd       xmm4, xmm2
                 addpd       xmm5, xmm3
 
-                lea         CC, [LDB * 4 + LDB]
+                //lea         CC, [LDB * 4 + LDB]
+                lea         CC, [LDB * 2 + LDB]
 
                 movapd      xmm2, xmmword ptr [BB + LDB * 2 + 2 * FLOAT_SIZE]   ; LDB * 7
                 movapd      xmm3, xmm2
@@ -482,14 +517,16 @@ L12:
                 addpd       xmm7, xmm3
 
                 //sub         BB, LDB
-                sub         BB, CC
+                //sub         BB, CC
+                add         BB, CC
 
+#if 0
                 ///////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////
    
                 // Prepare for next loop
 
-                movapd      xmm2, xmmword ptr [BB +       4 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
 
                 movaps      xmm0, xmmword ptr [AA +       8 * FLOAT_SIZE]
@@ -498,14 +535,29 @@ L12:
                 pshufd      xmm1, xmm1, 0x44
 
                 ///////////////////////////////////////////////////////////////
+#endif
 
                 add         AA, 8 * FLOAT_SIZE
-                add         BB, 4 * FLOAT_SIZE
+                //add         BB, 4 * FLOAT_SIZE
 
                 // KK -= 1;
                 sub         KK, 1
                 BRANCH
                 jne         L12
+
+                // IACA_END
+
+#ifndef IACA_MARKS_OFF
+
+                mov     ebx, 222
+                _emit   0x64
+                _emit   0x67
+                _emit   0x90
+
+                _emit   0x0F
+                _emit   0x0B
+
+#endif  /* IACA_MARKS_OFF */
 
                 ALIGN_16
 L15:
@@ -556,7 +608,7 @@ L15:
             }
 
             // for Intel Architecture Code Analyzer 2.1
-            IACA_END
+            //IACA_END
 
         } while (0);
 

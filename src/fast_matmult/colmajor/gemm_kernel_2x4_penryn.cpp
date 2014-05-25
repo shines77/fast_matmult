@@ -3,6 +3,7 @@
 #define _ASSEMBLER_
 #endif
 
+#include <fast_matmult/iacaMarks.h>
 #include <fast_matmult/colmajor/gemm_kernel_2x4_penryn.h>
 
 #define TRANSA          1
@@ -169,6 +170,20 @@ L01:
         mov     I, M
         sar     I, 1
         jle     L20
+
+        // IACA_START
+
+#ifndef IACA_MARKS_OFF
+
+        _emit   0x0F
+        _emit   0x0B
+
+        mov     ebx, 111
+        _emit   0x64
+        _emit   0x67
+        _emit   0x90
+
+#endif  /* IACA_MARKS_OFF */
 
         ALIGN_16
 L11:
@@ -381,6 +396,20 @@ L12:
         sub     eax, 1
         BRANCH
         jne     L12
+
+        // IACA_END
+
+#ifndef IACA_MARKS_OFF
+
+        mov     ebx, 222
+        _emit   0x64
+        _emit   0x67
+        _emit   0x90
+
+        _emit   0x0F
+        _emit   0x0B
+
+#endif  /* IACA_MARKS_OFF */
 
         ALIGN_16
 L15:

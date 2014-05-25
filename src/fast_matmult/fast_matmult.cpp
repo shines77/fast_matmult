@@ -983,6 +983,9 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
          *********************************************/
         matrix_init_elements(C4, M, N, MatInitZeros);
 
+        //matrix_init_elements(A,  M, K, MatInitOrder);
+        //matrix_init_elements(B,  K, N, MatInitOrder);
+
         stopWatch.start();
         matmult_s_row_tiling_NxM_K_sse2(M, N, K, 1.0, A, K, B, N, 0.0, C4, N);
         stopWatch.stop();
