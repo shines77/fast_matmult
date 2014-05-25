@@ -189,7 +189,7 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
 
         TILING_INNER_LOOP_END();
 
-#elif 1
+#elif 0
         // ÄÚ²ãÑ­»·Ë³Ðò: n, m - k
         //TILING_INNER_LOOP_BEGIN_EX(n, m, 4, 2);
         TILING_INNER_LOOP_BEGIN_EX(m, n, 2, 4);
@@ -225,10 +225,6 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
                 lea         LDA, [LDA * FLOAT_SIZE]
                 lea         LDB, [LDB * FLOAT_SIZE]
 
-                mov         KK, k
-
-//                ALIGN_16
-//L01:
 #if 0
                 movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
                 movapd      xmm3, xmm2
@@ -257,9 +253,10 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
                 xorpd       xmm7, xmm7
 #endif
 
+                mov         KK, k
                 // KK = K / 8
-                sar     KK, 3
-                je      L15
+                sar         KK, 3
+                je          L15
 
                 ALIGN_16
 
@@ -505,7 +502,399 @@ L12:
 #if 0
                 ///////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////
-   
+
+                // Prepare for next loop
+
+                movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                movaps      xmm0, xmmword ptr [AA +       8 * FLOAT_SIZE]
+                pshufd      xmm0, xmm0, 0x44
+                movaps      xmm1, xmmword ptr [AA + LDA + 8 * FLOAT_SIZE]
+                pshufd      xmm1, xmm1, 0x44
+
+                ///////////////////////////////////////////////////////////////
+#endif
+
+                add         AA, 16 * FLOAT_SIZE
+                add         BB, 32 * FLOAT_SIZE
+
+                // KK -= 1;
+                sub         KK, 1
+                BRANCH
+                jne         L12
+
+                // IACA_END
+
+#ifndef IACA_MARKS_OFF
+
+                mov     ebx, 222
+                _emit   0x64
+                _emit   0x67
+                _emit   0x90
+
+                _emit   0x0F
+                _emit   0x0B
+
+#endif  /* IACA_MARKS_OFF */
+
+                ALIGN_16
+L15:
+                /*
+                lea         eax, [alpha]
+
+                // From: SSE3
+                movddup     xmm3, dword ptr [eax]
+
+                mulpd       xmm4, xmm3
+                mulpd       xmm5, xmm3
+                mulpd       xmm6, xmm3
+                mulpd       xmm7, xmm3
+                //*/
+
+                ///////////////////////////////////////////////////////////
+
+                movapd      xmm0, xmmword ptr [CC + 0   + 0 * FLOAT_SIZE]
+                movapd      xmm1, xmmword ptr [CC + 0   + 2 * FLOAT_SIZE]
+                movapd      xmm2, xmmword ptr [CC + LDC + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmmword ptr [CC + LDC + 2 * FLOAT_SIZE]
+
+                addpd       xmm4, xmm0
+                addpd       xmm6, xmm1
+                addpd       xmm5, xmm2
+                addpd       xmm7, xmm3
+
+                movapd      xmmword ptr [CC + 0   + 0 * FLOAT_SIZE], xmm4
+                movapd      xmmword ptr [CC + 0   + 2 * FLOAT_SIZE], xmm6
+                movapd      xmmword ptr [CC + LDC + 0 * FLOAT_SIZE], xmm5
+                movapd      xmmword ptr [CC + LDC + 2 * FLOAT_SIZE], xmm7
+
+                ///////////////////////////////////////////////////////////
+
+                // CC += 4 * FLOAT_SIZE;
+                //add         CC, 4 * FLOAT_SIZE
+
+                ///////////////////////////////////////////////////////////
+
+                pop         edx
+                pop         ebx
+                pop         ecx
+                pop         eax
+                pop         esi
+                pop         edi
+            }
+
+            // for Intel Architecture Code Analyzer 2.1
+            //IACA_END
+
+        } while (0);
+
+        TILING_INNER_LOOP_END_EX();
+
+#elif 1
+        // ÄÚ²ãÑ­»·Ë³Ðò: n, m - k
+        //TILING_INNER_LOOP_BEGIN_EX(n, m, 4, 2);
+        TILING_INNER_LOOP_BEGIN_EX(m, n, 2, 4);
+
+        do {
+            A_ = &A[m * lda + k_start];
+            B_ = &B[k_start * ldb + n];
+
+            C_ = &C[m * ldc + n];
+
+            k = (k_end - k_start);
+
+            // for Intel Architecture Code Analyzer 2.1
+            //IACA_START
+
+            __asm {
+                push        edi
+                push        esi
+                push        eax
+                push        ecx
+                push        ebx
+                push        edx
+
+                ///////////////////////////////////////////////////////////
+
+                mov         AA, A_
+                mov         BB, B_
+                mov         CC, C_
+
+                mov         LDA, lda
+                mov         LDB, ldb
+
+                lea         LDA, [LDA * FLOAT_SIZE]
+                lea         LDB, [LDB * FLOAT_SIZE]
+
+#if 0
+                movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                //punpcklqdq  xmm2, xmm4
+                //punpckhqdq  xmm3, xmm4
+
+                movaps      xmm0, xmmword ptr [AA +       0 * FLOAT_SIZE]
+                pshufd      xmm0, xmm0, 0x44
+                movaps      xmm1, xmmword ptr [AA + LDA + 0 * FLOAT_SIZE]
+                pshufd      xmm1, xmm1, 0x44
+#endif
+
+#if defined(USE_PREFETCH_C) && (USE_PREFETCH_C != 0)
+
+                xorpd       xmm4, xmm4
+                PREFETCH_C  byte ptr [CC + 0    + 1 * FLOAT_SIZE]
+                xorpd       xmm5, xmm5
+                PREFETCH_C  byte ptr [CC + LDC  + 3 * FLOAT_SIZE]
+                xorpd       xmm6, xmm6
+                xorpd       xmm7, xmm7
+#else
+                xorpd       xmm4, xmm4
+                xorpd       xmm5, xmm5
+                xorpd       xmm6, xmm6
+                xorpd       xmm7, xmm7
+#endif
+
+                mov         KK, k
+                // KK = K / 8
+                sar         KK, 3
+                je          L15
+
+                ALIGN_16
+
+                // IACA_START
+
+#ifndef IACA_MARKS_OFF
+
+                _emit   0x0F
+                _emit   0x0B
+
+                mov     ebx, 111
+                _emit   0x64
+                _emit   0x67
+                _emit   0x90
+
+#endif  /* IACA_MARKS_OFF */
+
+L12:
+    #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
+                PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 0) * FLOAT_SIZE]
+    #endif
+
+    #if defined(USE_PREFETCH_B) && (USE_PREFETCH_B != 0)
+                PREFETCH_B  byte ptr [BB + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
+                PREFETCH_B  byte ptr [BB + LDC + (PREFETCH_SIZE_B + 0) * FLOAT_SIZE]
+    #endif
+
+                ///////////////////////////////////////////////////////////////
+                ///////////////////////////////////////////////////////////////
+#if 1
+                movaps      xmm0, xmmword ptr [AA + 0 * FLOAT_SIZE]
+                punpcklqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA + 2 * FLOAT_SIZE]
+                punpcklqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 0 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+#endif
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 2 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                //////////////////////////////////
+
+                movaps      xmm0, xmmword ptr [AA + 0 * FLOAT_SIZE]
+                punpckhqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA + 2 * FLOAT_SIZE]
+                punpckhqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 4 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 6 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                ////////////////////////////////////////////////////
+
+                movaps      xmm0, xmmword ptr [AA +  4 * FLOAT_SIZE]
+                punpcklqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA +  6 * FLOAT_SIZE]
+                punpcklqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB +  8 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 10 * FLOAT_SIZE]
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                //////////////////////////////////
+
+                movaps      xmm0, xmmword ptr [AA +  4 * FLOAT_SIZE]
+                punpckhqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA +  6 * FLOAT_SIZE]
+                punpckhqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 12 * FLOAT_SIZE]   ; LDB * 3
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 14 * FLOAT_SIZE]   ; LDB * 3
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+    #if defined(USE_PREFETCH_A) && (USE_PREFETCH_A != 0)
+                PREFETCH_A  byte ptr [AA + (PREFETCH_SIZE_A + 8) * FLOAT_SIZE]
+    #endif
+
+                ///////////////////////////////////////////////////////////////
+                ///////////////////////////////////////////////////////////////
+
+                movaps      xmm0, xmmword ptr [AA +  8 * FLOAT_SIZE]
+                punpcklqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA + 10 * FLOAT_SIZE]
+                punpcklqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 16 * FLOAT_SIZE]   ; LDB * 4
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 18 * FLOAT_SIZE]   ; LDB * 4
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                //////////////////////////////////
+
+                movaps      xmm0, xmmword ptr [AA +  8 * FLOAT_SIZE]
+                punpckhqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA + 10 * FLOAT_SIZE]
+                punpckhqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 20 * FLOAT_SIZE]   ; LDB * 5
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 22 * FLOAT_SIZE]   ; LDB * 5
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                ////////////////////////////////////////////////////
+
+                movaps      xmm1, xmmword ptr [AA + 12 * FLOAT_SIZE]
+                punpcklqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA + 14 * FLOAT_SIZE]
+                punpcklqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 24 * FLOAT_SIZE]   ; LDB * 6
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 26 * FLOAT_SIZE]   ; LDB * 6
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+
+                //////////////////////////////////
+
+                movaps      xmm0, xmmword ptr [AA + 12 * FLOAT_SIZE]
+                punpckhqdq  xmm0, xmm0
+                movaps      xmm1, xmmword ptr [AA + 14 * FLOAT_SIZE]
+                punpckhqdq  xmm1, xmm1
+
+                movapd      xmm2, xmmword ptr [BB + 28 * FLOAT_SIZE]   ; LDB * 7
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm4, xmm2
+                addpd       xmm5, xmm3
+
+                movapd      xmm2, xmmword ptr [BB + 30 * FLOAT_SIZE]   ; LDB * 7
+                movapd      xmm3, xmm2
+
+                mulpd       xmm2, xmm0
+                mulpd       xmm3, xmm1
+
+                addpd       xmm6, xmm2
+                addpd       xmm7, xmm3
+#if 0
+                ///////////////////////////////////////////////////////////////
+                ///////////////////////////////////////////////////////////////
+
                 // Prepare for next loop
 
                 movapd      xmm2, xmmword ptr [BB +       0 * FLOAT_SIZE]
