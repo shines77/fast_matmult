@@ -53,6 +53,7 @@ typedef struct cblas_arg_t {
     void       *beta;
     void       *c;
     cblas_int   ldc;
+    int         nthreads;
 } cblas_arg_t;
 
 #define CBLAS_INDEX size_t
@@ -118,6 +119,8 @@ typedef enum eMatrixInitFcn {
     MatInitSpecify,
     MatInitFcnMax
 } eMatrixInitFcn;
+
+typedef void (*cblas_func) (int mode, cblas_arg_t *args, const float_t *sa, const float_t *sb, long dummy);
 
 typedef void (*cblas_gemm_func) (const cblas_int m, const cblas_int n, const cblas_int k,
                                  const float_t alpha,

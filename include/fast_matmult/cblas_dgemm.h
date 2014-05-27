@@ -12,15 +12,15 @@
 extern "C" {
 #endif
 
-void cblas_dgemm(const eMatrixOrder order, const eMatrixTrans transa,
-                 const eMatrixTrans transb,
+void cblas_dgemm(const Cblas_Order order, const Cblas_Transpose transa,
+                 const Cblas_Transpose transb,
                  const cblas_int m, const cblas_int n, const cblas_int k,
                  const float_t *alpha,
                  const float_t *a, const cblas_int lda,
                  const float_t *b, const cblas_int ldb,
                  const float_t *beta,
                  float_t *c, const cblas_int ldc,
-                 cblas_gemm_func gemm_func);
+                 cblas_func gemm_func);
 
 #ifdef __cplusplus
 }

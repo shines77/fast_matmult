@@ -1,31 +1,42 @@
 
+#include <stdio.h>
+
+#include <fast_matmult/common.h>
 #include <fast_matmult/cblas_dgemm.h>
 
 /**
  *
- * 我们的 cblas_gemm 默认是使用 rowmajor 方式的, 这点跟GotoBlas2是不同的
+ * 我们的 cblas_dgemm 默认是使用 rowmajor 方式的
  *
  **/
-void cblas_dgemm(const eMatrixOrder order, const eMatrixTrans transA,
-                 const eMatrixTrans transB,
+void cblas_dgemm(const Cblas_Order order, const Cblas_Transpose transA,
+                 const Cblas_Transpose transB,
                  const cblas_int m, const cblas_int n, const cblas_int k,
                  const float_t *alpha,
                  const float_t *a, const cblas_int lda,
                  const float_t *b, const cblas_int ldb,
                  const float_t *beta,
                  float_t *c, const cblas_int ldc,
-                 cblas_gemm_func gemm_func)
+                 cblas_func gemm_func)
 {
     cblas_arg_t args;
     int transa, transb;
     cblas_int nrowa, nrowb, info;
 
+    float_t *buffer = NULL;
+    float_t *sa, *sb;
+
+    int mode = BLAS_DOUBLE  | BLAS_REAL;
+
     args.alpha = (void *)alpha;
     args.beta  = (void *)beta;
+    args.nthreads = 0;
 
     transa = -1;
     transb = -1;
     info   =  0;
+
+/* 注意: 我们的 cblas_dgemm 默认是使用 rowmajor 方式的, 这点跟GotoBlas2是不同的 */
 
 #if defined(CBLAS_USE_ROWMAJOR) && (CBLAS_USE_ROWMAJOR != 0)
 
@@ -209,9 +220,14 @@ void cblas_dgemm(const eMatrixOrder order, const eMatrixTrans transA,
 #endif  /* CBLAS_USE_ROWMAJOR */
 
     if (info >= 0) {
-        //BLASFUNC(xerbla)(ERROR_NAME, &info, sizeof(ERROR_NAME));
+        // BLASFUNC(xerbla)(ERROR_NAME, &info, sizeof(ERROR_NAME));
+        printf("cblas_dgemm() Error: info = %d\n\n", info);
         return;
     }
 
     if ((args.m == 0) || (args.n == 0)) { return; }
+
+    if (gemm_func) {
+        gemm_func(mode, &args, sa, sb, 0);
+    }
 }

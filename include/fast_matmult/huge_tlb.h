@@ -1,6 +1,6 @@
 
-#ifndef _HUGE_TLB_H_
-#define _HUGE_TLB_H_
+#ifndef _MATMULT_HUGE_TLB_H_
+#define _MATMULT_HUGE_TLB_H_
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -36,4 +36,4 @@ bool huge_tlb_free_ex(void *p, size_t size);
 }
 #endif
 
-#endif  /* _HUGE_TLB_H_ */
+#endif  /* _MATMULT_HUGE_TLB_H_ */

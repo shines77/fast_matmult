@@ -19,10 +19,17 @@
 #define _OS_WINDOWS_        1
 #endif
 
+#endif  /* (_WIN32 || _WIN64) && _MSC_VER */
+
 #include <fast_matmult/lang_def.h>
 #include <fast_matmult/cblas_def.h>
 
-#endif  /* (_WIN32 || _WIN64) && _MSC_VER */
+#define BLAS_PREC           0x0003U
+#define BLAS_SINGLE         0x0000U
+#define BLAS_DOUBLE         0x0001U
+#define BLAS_XDOUBLE        0x0002U
+#define BLAS_REAL           0x0000U
+#define BLAS_COMPLEX        0x0004U
 
 #ifdef __cplusplus
 extern "C" {
