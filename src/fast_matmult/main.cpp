@@ -58,7 +58,7 @@ using namespace annlab;
 #ifdef _MSC_VER
 #ifdef _DEBUG
 // 如果你没有安装vld(Visual Leak Detector), 请注释掉这一句.
-#include <vld.h>
+//#include <vld.h>
 #endif  /* _DEBUG */
 #endif  /* _MSC_VER */
 

@@ -20,7 +20,7 @@
 			OutputDirectory="$(SolutionDir)bin\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)gen\tmp\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\ProjEnvProperty_vc2005.vsprops"
+			InheritedPropertySheets="..\ProjEnv\ProjEnvProperty_vc2005.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -97,7 +97,7 @@
 			OutputDirectory="$(SolutionDir)bin\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)gen\tmp\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\ProjEnvProperty_vc2005.vsprops"
+			InheritedPropertySheets="..\ProjEnv\ProjEnvProperty_vc2005.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\fast_matmult\cblas_dgemm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\fast_matmult\fast_matmult.cpp"
 				>
 			</File>
@@ -269,6 +273,14 @@
 			>
 			<File
 				RelativePath="..\..\..\..\include\fast_matmult\aligned_malloc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\fast_matmult\cblas_def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\fast_matmult\cblas_dgemm.h"
 				>
 			</File>
 			<File

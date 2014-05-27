@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)bin\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)gen\tmp\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\ProjEnvProperty_vc2008.vsprops"
+			InheritedPropertySheets="..\ProjEnv\ProjEnvProperty_vc2008.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -96,7 +96,7 @@
 			OutputDirectory="$(SolutionDir)bin\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)gen\tmp\$(MsvcPlatformToolset)\$(ProjectName)\$(MsvcPlatformShortName)-$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\ProjEnvProperty_vc2008.vsprops"
+			InheritedPropertySheets="..\ProjEnv\ProjEnvProperty_vc2008.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
