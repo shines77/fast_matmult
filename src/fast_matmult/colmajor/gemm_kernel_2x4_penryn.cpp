@@ -1,10 +1,10 @@
 
+#include <fast_matmult/iacaMarks.h>
+#include <fast_matmult/colmajor/gemm_kernel_2x4_penryn.h>
+
 #ifndef _ASSEMBLER_
 #define _ASSEMBLER_
 #endif
-
-#include <fast_matmult/iacaMarks.h>
-#include <fast_matmult/colmajor/gemm_kernel_2x4_penryn.h>
 
 #define TRANSA          1
 #undef  TRANSA

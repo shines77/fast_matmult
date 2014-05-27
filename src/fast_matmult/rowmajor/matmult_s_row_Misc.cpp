@@ -523,7 +523,7 @@ void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
     //             [K][L]
     //
 
-#if CBLAS_ROW_MAJOR
+#if CBLAS_USE_ROWMAJOR
     float_t A_m_k;
 
     // (1.185 seconds)
@@ -972,7 +972,7 @@ L001:
     }
 #endif
 
-#else  /* !CBLAS_ROW_MAJOR */
+#else  /* !CBLAS_USE_ROWMAJOR */
 
     float_t B_k_n;
     // fastest (1.27-1.29 seconds)
@@ -1035,7 +1035,7 @@ L001:
         if (k_end > K)
             k_end = K;
     }
-#endif  /* CBLAS_ROW_MAJOR */
+#endif  /* CBLAS_USE_ROWMAJOR */
 
 }
 

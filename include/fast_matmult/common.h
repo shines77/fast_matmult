@@ -1,6 +1,6 @@
 
-#ifndef _COMMON_H_
-#define _COMMON_H_
+#ifndef _MATMULT_COMMON_H_
+#define _MATMULT_COMMON_H_
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -20,6 +20,7 @@
 #endif
 
 #include <fast_matmult/lang_def.h>
+#include <fast_matmult/cblas_def.h>
 
 #endif  /* (_WIN32 || _WIN64) && _MSC_VER */
 
@@ -40,21 +41,21 @@ extern "C" {
 
     #if defined(_OS_WINDOWS_) && (defined(__64BIT__) || defined(_WIN64))
         #ifdef _MSC_VER
-            typedef __int64 BLASLONG;
-            typedef unsigned __int64 BLASULONG;
+            typedef __int64 blaslong;
+            typedef unsigned __int64 blas_ulong;
         #else
-            typedef long long BLASLONG;
-            typedef unsigned long long BLASULONG;
+            typedef long long blaslong;
+            typedef unsigned long long blas_ulong;
         #endif
     #else
-        typedef long BLASLONG;
-        typedef unsigned long BLASULONG;
+        typedef long blas_long;
+        typedef unsigned long blas_ulong;
     #endif
 
     #if defined(USE_64BIT_INT) && (USE_64BIT_INT != 0)
-        typedef BLASLONG blasint;
+        typedef blas_long blas_int;
     #else
-        typedef int blasint;
+        typedef int blas_int;
     #endif
 #else   /* !_ASSEMBLER_ */
     #ifdef USE64BITINT
@@ -102,6 +103,82 @@ extern "C" {
     #define COMPSIZE            2
 #endif
 
+#ifdef NEEDBUNDERSCORE
+#define BLASFUNC(FUNC)          FUNC##_
+#else
+#define BLASFUNC(FUNC)          FUNC
+#endif
+
+/* define __cdecl, __fastcall for windows */
+
+#if defined(_MSC_VER)
+
+#ifndef __STDCALL
+#define __STDCALL       __stdcall
+#endif
+
+#ifndef __CDECL
+#define __CDECL         __cdecl
+#endif
+
+#ifndef __FASTCALL
+#define __FASTCALL      __fastcall
+#endif
+
+/* default call: __cdecl */
+#ifndef __DEFCALL
+#define __DEFCALL       __CDECL
+#endif
+
+#else  /* !_MSC_VER */
+
+#undef __STDCALL
+#undef __CDECL
+#undef __FASTCALL
+#undef __DEFCALL
+
+#define __STDCALL
+#define __CDECL
+#define __FASTCALL
+#define __DEFCALL
+
+#endif  /* _MSC_VER */
+
+/* define __cdecl, __fastcall for linux */
+
+#if defined(__GNUC__)
+
+#ifndef _GCC_STDCALL
+#define _GCC_STDCALL
+#endif
+
+#ifndef _GCC_CDECL
+#define _GCC_CDECL          __attribute__((cdecl))
+#endif
+
+#ifndef _GCC_FASTCALL
+#define _GCC_FASTCALL       __attribute__((fastcall))
+#endif
+
+/* default call: __cdecl */
+#ifndef _GCC_DEFCALL
+#define _GCC_DEFCALL        _GCC_CDECL
+#endif
+
+#else  /* !__GNUC__ */
+
+#undef _GCC_STDCALL
+#undef _GCC_CDECL
+#undef _GCC_FASTCALL
+#undef _GCC_DEFCALL
+
+#define _GCC_STDCALL
+#define _GCC_CDECL
+#define _GCC_FASTCALL
+#define _GCC_DEFCALL
+
+#endif  /* __GNUC__ */
+
 /* For Keyboard virtual code */
 
 enum MM_VT_KEYBOARDS {
@@ -127,4 +204,4 @@ enum MM_VT_KEYBOARDS {
 }
 #endif
 
-#endif  /* _COMMON_H_  */
+#endif  /* _MATMULT_COMMON_H_  */

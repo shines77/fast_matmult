@@ -1,6 +1,6 @@
 
-#ifndef _COMMON_ASM_H_
-#define _COMMON_ASM_H_
+#ifndef _MATMULT_COMMON_ASM_H_
+#define _MATMULT_COMMON_ASM_H_
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -20,93 +20,6 @@
 #include <emmintrin.h>
 
 #endif  /* (_WIN32 || _WIN64) && _MSC_VER */
-
-#ifndef _COMMON_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef _ASSEMBLER_
-    #ifdef QUAD_PRECISION
-        typedef struct {
-            unsigned long x[2];
-        } xdouble;
-    #elif defined EXPRECISION
-        #define xdouble long double
-    #else
-        #define xdouble double
-    #endif
-
-    #if defined(_OS_WINDOWS_) && (defined(__64BIT__) || defined(_WIN64))
-        #ifdef _MSC_VER
-            typedef __int64 BLASLONG;
-            typedef unsigned __int64 BLASULONG;
-        #else
-            typedef long long BLASLONG;
-            typedef unsigned long long BLASULONG;
-        #endif
-    #else
-        typedef long BLASLONG;
-        typedef unsigned long BLASULONG;
-    #endif
-
-    #if defined(USE_64BIT_INT) && (USE_64BIT_INT != 0)
-        typedef BLASLONG blasint;
-    #else
-        typedef int blasint;
-    #endif
-#else   /* !_ASSEMBLER_ */
-    #ifdef USE64BITINT
-        #define INT_SHIFT       3
-        #define INT_SIZE        8
-    #else
-        #define INT_SHIFT
-        #define INT_SIZE        4
-    #endif
-#endif  /* _ASSEMBLER_ */
-
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef USE_XDOUBLE
-    #define FLOAT_T             xdouble
-    #ifdef QUAD_PRECISION
-        #define XFLOAT_T        xidouble
-    #endif
-    #ifdef QUAD_PRECISION
-        #define FLOAT_SIZE      32
-        #define BASE_SHIFT      5
-        #define ZBASE_SHIFT     6
-    #else
-        #define FLOAT_SIZE      16
-        #define BASE_SHIFT      4
-        #define ZBASE_SHIFT     5
-    #endif
-#elif defined(USE_DOUBLE)
-    #define FLOAT_T             double
-    #define FLOAT_SIZE          8
-    #define BASE_SHIFT          3
-    #define ZBASE_SHIFT         4
-#else  /* USE_FLOAT */
-    #define FLOAT_T             float
-    #define FLOAT_SIZE          4
-    #define BASE_SHIFT          2
-    #define ZBASE_SHIFT         3
-#endif  /* !USE_XDOUBLE */
-
-#ifndef XFLOAT_T
-    #define XFLOAT_T            FLOAT_T
-#endif
-
-#ifndef COMPLEX
-    #define COMPSIZE            1
-#else
-    #define COMPSIZE            2
-#endif
-
-#endif  /* _COMMON_H_ */
 
 #ifdef _MSC_VER
 #define ALIGN_4         ALIGN 4
@@ -159,75 +72,9 @@ extern "C" {
 #define movapd          movaps
 #endif
 
-#if defined(_MSC_VER)
-
-#ifndef __STDCALL
-#define __STDCALL       __stdcall
-#endif
-
-#ifndef __CDECL
-#define __CDECL         __cdecl
-#endif
-
-#ifndef __FASTCALL
-#define __FASTCALL      __fastcall
-#endif
-
-/* default call: __cdecl */
-#ifndef __DEFCALL
-#define __DEFCALL       __CDECL
-#endif
-
-#else
-
-#undef __STDCALL
-#undef __CDECL
-#undef __FASTCALL
-#undef __DEFCALL
-
-#define __STDCALL
-#define __CDECL
-#define __FASTCALL
-#define __DEFCALL
-
-#endif  /* _MSC_VER */
-
-#if defined(__GNUC__)
-
-#ifndef _GCC_STDCALL
-#define _GCC_STDCALL
-#endif
-
-#ifndef _GCC_CDECL
-#define _GCC_CDECL          __attribute__((cdecl))
-#endif
-
-#ifndef _GCC_FASTCALL
-#define _GCC_FASTCALL       __attribute__((fastcall))
-#endif
-
-/* default call: __cdecl */
-#ifndef _GCC_DEFCALL
-#define _GCC_DEFCALL        _GCC_CDECL
-#endif
-
-#else
-
-#undef _GCC_STDCALL
-#undef _GCC_CDECL
-#undef _GCC_FASTCALL
-#undef _GCC_DEFCALL
-
-#define _GCC_STDCALL
-#define _GCC_CDECL
-#define _GCC_FASTCALL
-#define _GCC_DEFCALL
-
-#endif  /* __GNUC__ */
-
 #ifdef  USE_DOUBLE
 #undef  FLOAT_T
 #define FLOAT_T         double
 #endif  /* USE_DOUBLE */
 
-#endif  /* _COMMON_ASM_H_  */
+#endif  /* _MATMULT_COMMON_ASM_H_  */

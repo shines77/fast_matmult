@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\fast_matmult\cblas_dgemm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\fast_matmult\fast_matmult.cpp"
 				>
 			</File>
@@ -266,6 +270,14 @@
 			>
 			<File
 				RelativePath="..\..\..\..\include\fast_matmult\aligned_malloc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\fast_matmult\cblas_def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\fast_matmult\cblas_dgemm.h"
 				>
 			</File>
 			<File

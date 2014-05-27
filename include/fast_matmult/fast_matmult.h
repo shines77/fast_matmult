@@ -18,38 +18,11 @@
 
 #define USE_LARGE_PAGES         0
 
-/* 矩阵使用double还是float? 1为double, 其他为float */
-#define ANNLAB_USE_DOUBLE       1
-
 #define FLOAT_EPSINON           (0.00001)
 #define DOUBLE_EPSINON          (0.00000001)
 
 #define FLOAT_EPSINON_TEST      (0.08f)
 #define DOUBLE_EPSINON_TEST     (0.05)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if defined(ANNLAB_USE_DOUBLE) && (ANNLAB_USE_DOUBLE != 0)
-    #ifndef FLOAT_T
-        #define FLOAT_T             double
-    #endif
-    #define FLOAT_T_EPSILON         DOUBLE_EPSINON
-    #define FLOAT_T_EPSINON_TEST    DOUBLE_EPSINON_TEST
-    typedef double float_t;
-#else
-    #ifndef FLOAT_T
-        #define FLOAT_T             float
-    #endif
-    #define FLOAT_T_EPSILON         FLOAT_EPSINON
-    #define FLOAT_T_EPSINON_TEST    FLOAT_EPSINON_TEST
-    typedef float float_t;
-#endif
-
-#ifdef __cplusplus
-}
-#endif
 
 #define DEFAULT_CACHELINE   128
 #define RAND_FIXED_SEED     (2014UL)
@@ -63,8 +36,6 @@ extern "C" {
 #define FORCE_INLINE        inline
 #define RESTRICT            restrict
 #endif
-
-#define CBLAS_ROW_MAJOR     1
 
 #ifdef __GNUC__
     #define likely(x)       __builtin_expect(!!(x), 1)
@@ -80,6 +51,35 @@ extern "C" {
 
 #define SetCPUAffinityMask8(m1, m2, m3, m4, m5, m6, m7, m8) \
     ((SetCPUAffinityMask4(m5, m6, m7, m8) << 4) | SetCPUAffinityMask4(m1, m2, m3, m4))
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum TestFunc_Index {
+    TEST_FUNC_INDEX_FIRST = 0,
+    TEST_FUNC_PURE_C_NO_TILING = 1,
+    TEST_FUNC_PURE_C_TILING = 2,
+    TEST_FUNC_SSEX_TILING = 3,
+    TEST_FUNC_PURE_C_ALL = 4,
+    TEST_FUNC_ALL_TILING = 5,
+    TEST_FUNC_ALL_TEST = 6,
+    TEST_FUNC_INDEX_LAST
+} TestFunc_Index;
+
+typedef enum TestFunc_Mask {
+    TEST_FUNC_MASK_NONE = 0,
+    TEST_FUNC_MASK_PURE_C_NO_TILING = 1,
+    TEST_FUNC_MASK_PURE_C_TILING = 2,
+    TEST_FUNC_MASK_SSEX_TILING = 4,
+    TEST_FUNC_MASK_ALL_TILING = 6,
+    TEST_FUNC_MASK_ALL_TEST = 7,
+    TEST_FUNC_MASK_MAX
+} TestFunc_Mask;
+
+#ifdef __cplusplus
+}
+#endif
 
 #define Lx_start(idx)       L##idx##_start
 #define Lx_end(idx)         L##idx##_end
@@ -145,66 +145,6 @@ extern "C" {
 
 #define TILING_INNER_LOOP_END_EX    TILING_INNER_LOOP_END
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-enum eMatrixOrder {
-    MatColMajor = 0,
-    MatRowMajor,
-    MatOrderMax
-};
-
-enum eMatrixTrans {
-    MatNoTrans = 0,
-    MatTrans,
-    MatConjTrans,
-    MaTransMax
-};
-
-enum eMatrixItemOrder {
-    MatItemOrderAsc = 0,
-    MatItemOrderDesc,
-    MatItemOrderTransAsc,
-    MatItemOrderTransDesc,
-    MatItemOrderMax
-};
-
-enum eMatInitFcn {
-    MatInitZeros = 0,
-    MatInitOnes,
-    MatInitRands,
-    MatInitRands_Positive,
-    MatInitOrder,
-    MatInitSpecify,
-    MatInitFcnMax
-};
-
-enum TestFunc_Index {
-    TEST_FUNC_INDEX_FIRST = 0,
-    TEST_FUNC_PURE_C_NO_TILING = 1,
-    TEST_FUNC_PURE_C_TILING = 2,
-    TEST_FUNC_SSEX_TILING = 3,
-    TEST_FUNC_PURE_C_ALL = 4,
-    TEST_FUNC_ALL_TILING = 5,
-    TEST_FUNC_ALL_TEST = 6,
-    TEST_FUNC_INDEX_LAST
-};
-
-enum TestFunc_Mask {
-    TEST_FUNC_MASK_NONE = 0,
-    TEST_FUNC_MASK_PURE_C_NO_TILING = 1,
-    TEST_FUNC_MASK_PURE_C_TILING = 2,
-    TEST_FUNC_MASK_SSEX_TILING = 4,
-    TEST_FUNC_MASK_ALL_TILING = 6,
-    TEST_FUNC_MASK_ALL_TEST = 7,
-    TEST_FUNC_MASK_MAX
-};
-
-#ifdef __cplusplus
-}
-#endif
-
 /* 因为下面这些函数用了可选参数, 所以必须以C++的方式声明,                    */
 /* 如果想要在纯C环境下使用, 自己去掉可变参数就可以了(相应的要调整调用的代码) */
 
@@ -216,13 +156,13 @@ float_t *matrix_offset_malloc(unsigned int M, unsigned int N,
 
 float_t *matrix_malloc_ex(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE,
-            eMatInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
+            eMatrixInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
             eMatrixItemOrder order = MatItemOrderAsc);
 
 void matrix_free(float_t *A);
 
 void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
-        eMatInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
+        eMatrixInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
         eMatrixItemOrder order = MatItemOrderAsc);
 
 bool matrix_compare(const float_t *A, const float_t *B, unsigned int M, unsigned int N,

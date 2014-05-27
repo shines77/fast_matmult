@@ -13,12 +13,14 @@
 // TODO: xmm and emm header files
 #endif
 
-#include <fast_matmult/fast_matmult.h>
 #include <fast_matmult/common_asm.h>
+
+#include <fast_matmult/fast_matmult.h>
 #include <fast_matmult/stop_watch.h>
 #include <fast_matmult/huge_tlb.h>
 #include <fast_matmult/aligned_malloc.h>
 
+#include <fast_matmult/cblas_dgemm.h>
 #include <fast_matmult/rowmajor/matmult_s_row_X.h>
 #include <fast_matmult/rowmajor/matmult_s_row_Misc.h>
 #include <fast_matmult/rowmajor/matmult_s_row_tiling_K.h>
@@ -51,7 +53,7 @@ float_t *matrix_offset_malloc(unsigned int M, unsigned int N,
 
 float_t *matrix_malloc_ex(unsigned int M, unsigned int N,
                           unsigned int alignment,
-                          eMatInitFcn initFcn /* = MatInitZeros */,
+                          eMatrixInitFcn initFcn /* = MatInitZeros */,
                           float_t fillValue /* = 0.0 */,
                           eMatrixItemOrder order /* = MatItemOrderAsc */)
 {
@@ -70,7 +72,7 @@ void matrix_free(float_t *A)
 }
 
 void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
-                          eMatInitFcn initFcn /* = MatInitZeros */,
+                          eMatrixInitFcn initFcn /* = MatInitZeros */,
                           float_t fillValue /* = 0.0 */,
                           eMatrixItemOrder order /* = MatItemOrderAsc */)
 {
@@ -237,7 +239,7 @@ void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N)
     unsigned int n_start, n_end;
     unsigned int m_step, n_step;
     //unsigned int n_start_min = 0, n_start_max = 0;
-    double temp1, temp2;
+    float_t temp1, temp2;
 
     m_step = 128;
     n_step = 128;
