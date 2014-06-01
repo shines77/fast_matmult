@@ -89,6 +89,7 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
     float_t *C_;
 
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
+    // 355.xx ms
     m_step = 8;
     k_step = 128;
     n_step = 512;
@@ -100,51 +101,86 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
     n_step = 512;
     //*/
 
-    /*
-    // 只打开C(t0), A(t0)的预读, 318.xx ms
-    m_step = 128;
-    k_step = 512;
-    n_step = 512;
-    //*/
-
     ///*
-    // 只打开C(t0), A(t0)的预读, 318.xx ms
+    // 只打开C(t0), A(t0)的预读, 318.xx ms - 355.xx ms
     m_step = 256;
     k_step = 512;
-    n_step = 512;
-    //*/
-#else
-    // 439.xx ms
-    m_step = 8;
-    k_step = 128;
-    n_step = 512;
-
-    /*
-    // 430.xx ms
-    m_step = 64;
-    k_step = 128;
-    n_step = 512;
+    n_step = 256;
     //*/
 
     /*
-    // 322.xx ms
+    // 只打开C(t0), A(t0)的预读, 318.xx ms - 354.xx ms
     m_step = 256;
-    k_step = 128;
+    k_step = 512;
+    n_step = 128;
+    //*/
+
+    /*
+    // 只打开C(t0), A(t0)的预读, 318.xx ms - 355.xx ms
+    m_step = 256;
+    k_step = 256;
     n_step = 512;
     //*/
 
     /*
-    // 313.xx ms
+    // 只打开C(t0), A(t0)的预读, 356.xx ms
     m_step = 128;
     k_step = 256;
     n_step = 512;
     //*/
 
     ///*
-    // 310.xx ms
+    // 只打开C(t0), A(t0)的预读, 445.xx ms
+    m_step = 256;
+    k_step = 512;
+    n_step = 512;
+    //*/
+#else
+    // 342.xx ms
+    m_step = 8;
+    k_step = 128;
+    n_step = 512;
+
+    ///*
+    // 339.xx ms
+    m_step = 64;
+    k_step = 512;
+    n_step = 128;
+    //*/
+
+    /*
+    // 338.xx ms
+    m_step = 64;
+    k_step = 128;
+    n_step = 512;
+    //*/
+
+    /*
+    // 339.xx ms
+    m_step = 256;
+    k_step = 128;
+    n_step = 512;
+    //*/
+
+    /*
+    // 336.xx ms
+    m_step = 128;
+    k_step = 256;
+    n_step = 512;
+    //*/
+
+    /*
+    // 288.xx ms - 336.xx ms
     m_step = 128;
     k_step = 512;
     n_step = 512;
+    //*/
+
+    /*
+    // 336.xx ms
+    m_step = 256;
+    k_step = 512;
+    n_step = 256;
     //*/
 #endif
 
@@ -597,12 +633,14 @@ L15:
         TILING_INNER_LOOP_BEGIN_EX(m, n, 2, 4);
 
         do {
-            A_ = &A[m * lda + k_start];
-            B_ = &B[k_start * ldb + n];
-
+            //A_ = &A[m * lda + k_start];
+            //B_ = &B[k_start * ldb + n];
+            A_ = &A[m * k_step];
+            B_ = &B[n * k_step];
+            
             C_ = &C[m * ldc + n];
 
-            k = (k_end - k_start);
+            k = k_step;
 
             // for Intel Architecture Code Analyzer 2.1
             //IACA_START

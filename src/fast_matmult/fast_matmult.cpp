@@ -840,6 +840,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
 
         printf("[3] 使用 tiling 分块技术和使用 SSEx 指令优化:\n\n");
 
+#if 0
         /*********************************
          *     serial_matmult_sse()      *
          *********************************/
@@ -856,6 +857,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         printf("[%-38s]  time: %8.2f ms, verify: %s\n\n", "serial_matmult_sse", elapsedTime, verify_result[verify_ok]);
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
+#endif
 
         /**********************************
          *     matrix_fast_matmult()      *
