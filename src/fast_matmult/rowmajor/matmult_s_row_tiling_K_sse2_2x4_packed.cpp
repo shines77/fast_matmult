@@ -89,27 +89,37 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
     float_t *C_;
 
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
-    // 355.xx ms
+    // 355.xx ms - [(n,m-k) 331.xx ms]
     m_step = 8;
     k_step = 128;
     n_step = 512;
 
+    // 355.xx ms - [(n,m-k) 331.xx ms]
+    m_step = 16;
+    k_step = 128;
+    n_step = 512;
+
+    // 355.xx ms - [(n,m-k) 339.xx ms]
+    m_step = 256;
+    k_step = 256;
+    n_step = 256;
+
     /*
-    // 只打开 A(t0)的预读, 317.xx ms
+    // 只打开 A(t0)的预读, 317.xx ms - [(n,m-k) 339.xx ms]
     m_step = 128;
     k_step = 512;
     n_step = 512;
     //*/
 
-    ///*
-    // 只打开C(t0), A(t0)的预读, 318.xx ms - 355.xx ms
+    /*
+    // 只打开C(t0), A(t0)的预读, 318.xx ms - 355.xx ms - [(n,m-k) 334.xx ms]
     m_step = 256;
     k_step = 512;
     n_step = 256;
     //*/
 
     /*
-    // 只打开C(t0), A(t0)的预读, 318.xx ms - 354.xx ms
+    // 只打开C(t0), A(t0)的预读, 318.xx ms - 354.xx ms - [(n,m-k) 334.xx ms]
     m_step = 256;
     k_step = 512;
     n_step = 128;
@@ -129,19 +139,64 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
     n_step = 512;
     //*/
 
-    ///*
-    // 只打开C(t0), A(t0)的预读, 445.xx ms
+    /*
+    // 只打开C(t0), A(t0)的预读, 445.xx ms - [(n,m-k) 334.xx ms]
     m_step = 256;
     k_step = 512;
     n_step = 512;
     //*/
 #else
-    // 342.xx ms
+    // 342.xx ms - [(n,m-k) 307.xx ms]
     m_step = 8;
     k_step = 128;
     n_step = 512;
 
-    ///*
+    // -- [(n,m-k) 321.xx ms]
+    m_step = 128;
+    k_step = 512;
+    n_step = 128;
+
+    // -- [(n,m-k) 315.xx ms]
+    m_step = 64;
+    k_step = 512;
+    n_step = 128;
+
+    // -- [(n,m-k) 329.xx ms]
+    m_step = 32;
+    k_step = 512;
+    n_step = 128;
+
+    // -- [(n,m-k) 324.xx ms]
+    m_step = 128;
+    k_step = 512;
+    n_step = 96;
+
+    // -- [(n,m-k) 350.xx ms]
+    m_step = 16;
+    k_step = 512;
+    n_step = 128;
+
+    // -- [(n,m-k) 496.xx ms]
+    m_step = 4;
+    k_step = 512;
+    n_step = 128;
+
+    // -- [(n,m-k) 324.xx ms]
+    m_step = 8;
+    k_step = 256;
+    n_step = 256;
+
+    // -- [(n,m-k) 313.xx ms]
+    m_step = 32;
+    k_step = 128;
+    n_step = 512;
+
+    // -- [(n,m-k) 303.xx ms]
+    m_step = 16;
+    k_step = 128;
+    n_step = 512;
+
+    /*
     // 339.xx ms
     m_step = 64;
     k_step = 512;
@@ -178,6 +233,13 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(const int M, const int N, const 
 
     /*
     // 336.xx ms
+    m_step = 256;
+    k_step = 512;
+    n_step = 256;
+    //*/
+
+    /*
+    // 336.xx ms - [(n,m-k) 334.xx ms]
     m_step = 256;
     k_step = 512;
     n_step = 256;
@@ -629,8 +691,8 @@ L15:
 
 #elif 1
         // 内层循环顺序: n, m - k
-        //TILING_INNER_LOOP_BEGIN_EX(n, m, 4, 2);
-        TILING_INNER_LOOP_BEGIN_EX(m, n, 2, 4);
+        TILING_INNER_LOOP_BEGIN_EX(n, m, 4, 2);
+        //TILING_INNER_LOOP_BEGIN_EX(m, n, 2, 4);
 
         do {
             //A_ = &A[m * lda + k_start];
