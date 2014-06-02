@@ -286,8 +286,8 @@ int main(int argc, char *argv[])
     set_thread_affinity();
 
     // 获取用户输入的程序运行模式routine_mode
-    //routine_mode = 3;
-    routine_mode = get_routine_mode(3);
+    routine_mode = 3;
+    //routine_mode = get_routine_mode(3);
     if (routine_mode == GETCH_EXIT_PROGRAM)
         goto _EXIT_MAIN;
 

@@ -334,7 +334,7 @@ L12:
 
         addpd   xmm5, xmm1
         movaps  xmm1, xmmword ptr [BB + 4 * FLOAT_SIZE]
-        addpd   xmm4, xmm1
+        addpd   xmm4, xmm2
         pshufd  xmm2, xmm3, 0x4e
         mulpd   xmm3, xmm0
         mulpd   xmm2, xmm0
@@ -349,7 +349,7 @@ L12:
 
         addpd   xmm5, xmm1
         movaps  xmm1, xmmword ptr [BB + 8 * FLOAT_SIZE]
-        addpd   xmm4, xmm1
+        addpd   xmm4, xmm2
         pshufd  xmm2, xmm3, 0x4e
         mulpd   xmm3, xmm0
         mulpd   xmm2, xmm0
@@ -364,7 +364,7 @@ L12:
 
         addpd   xmm5, xmm1
         movaps  xmm1, xmmword ptr [BB + 12 * FLOAT_SIZE]
-        addpd   xmm4, xmm1
+        addpd   xmm4, xmm2
         pshufd  xmm2, xmm3, 0x4e
         mulpd   xmm3, xmm0
         mulpd   xmm2, xmm0
@@ -379,7 +379,7 @@ L12:
 
         addpd   xmm5, xmm1
         movaps  xmm1, xmmword ptr [BB + 16 * FLOAT_SIZE]
-        addpd   xmm4, xmm1
+        addpd   xmm4, xmm2
         // BB += 32 * FLOAT_SIZE;
         sub     BB, -32 * FLOAT_SIZE
         pshufd  xmm2, xmm3, 0x4e

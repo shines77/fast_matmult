@@ -20,6 +20,121 @@
 #  define _MULT_SSE2_MODE           1
 #endif
 
+void tiling_ounter_loop_sample(int M, int N, int K)
+{
+    int m, n, k;
+    int m_start, m_end;
+    int n_start, n_end;
+    int k_start, k_end;
+    int m_max, n_max, k_max;
+    int m_step, n_step, k_step;
+
+    m_step = 8;
+    k_step = 128;
+    n_step = 512;
+
+    if (m_step > M)
+        m_step = M;
+    if (k_step > K)
+        k_step = K;
+    if (n_step > N)
+        n_step = N;
+
+    m_max = M;
+    n_max = N;
+    k_max = K;
+
+    // 分块循环顺序N, M, K, 内层循环顺序m, n, k
+    n_start = -n_step;
+    n_end   = 0;
+    do {
+        n_start += n_step;
+        n_end   += n_step;
+        if (n_start >= N)
+            break;
+        if (n_end > N)
+            n_end = N;
+
+        m_start = -m_step;
+        m_end   = 0;
+        do {
+            m_start += m_step;
+            m_end   += m_step;
+            if (m_start >= M)
+                break;
+            if (m_end > M)
+                m_end = M;
+
+            k_start = -k_step;
+            k_end   = 0;
+            do {
+                k_start += k_step;
+                k_end   += k_step;
+                if (k_start >= K)
+                    break;
+                if (k_end > K)
+                    k_end = K;
+
+                // 内层循环 m, n
+                for (m = m_start; m < m_end; ++m) {
+                    for (n = n_start; n < n_end; ++n) {
+                        // 最内层循环 k
+                        for (k = k_start; k < k_end; ++k) {
+                            //
+                        }
+                    }
+                }
+
+            } while (1);  // next k_step
+            //
+        } while (1);  // next m_step
+        //
+    } while (1);  // next n_step
+
+    // 分块循环顺序N, M, K, 内层循环顺序m, n, k
+    n_start = 0;
+    n_end   = n_start + n_step;
+    if (n_end > N)
+        n_end = N;
+    while (n_start < N) {
+        m_start = 0;
+        m_end   = m_start + m_step;
+        if (m_end > M)
+            m_end = M;
+        while (m_start < M) {
+            k_start = 0;
+            k_end   = k_start + k_step;
+            if (k_end > K)
+                k_end = K;
+            while (k_start < K) {
+
+                // 内层循环 m, n
+                for (m = m_start; m < m_end; ++m) {
+                    for (n = n_start; n < n_end; ++n) {
+                        // 最内层循环 k
+                        for (k = k_start; k < k_end; ++k) {
+                            //
+                        }
+                    }
+                }
+
+                k_start += k_step;
+                k_end   += k_step;
+                if (k_end > K)
+                    k_end = K;
+            }
+            m_start += m_step;
+            m_end   += m_step;
+            if (m_end > M)
+                m_end = M;
+        }
+        n_start += n_step;
+        n_end   += n_step;
+        if (n_end > N)
+            n_end = N;
+    }
+}
+
 void serial_matmult(unsigned int M, unsigned int K, unsigned int N,
                     float_t *A, float_t *B, float_t *C)
 {
