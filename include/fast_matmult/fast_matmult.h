@@ -12,6 +12,9 @@
 #include <intrin.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
+#else
+#include <xmmintrin.h>
+#include <emmintrin.h>
 #endif
 
 #include "fast_matmult/common.h"
@@ -31,10 +34,14 @@
 #define INLINE              __inline
 #define FORCE_INLINE        __forceinline
 #define RESTRICT            __restrict
-#else
+#elif defined(__GNUC__) && 0
 #define INLINE              inline
 #define FORCE_INLINE        inline
 #define RESTRICT            restrict
+#else
+#define INLINE              inline
+#define FORCE_INLINE        inline
+#define RESTRICT
 #endif
 
 #ifdef __GNUC__
@@ -102,7 +109,7 @@ typedef enum TestFunc_Mask {
             while (L2##_start < L2##_max) {                                 \
                 L3##_start = 0;                                             \
                 L3##_end   = L3##_start + L3##_step;                        \
-                if (L3##_end >L3##_max)                                     \
+                if (L3##_end > L3##_max)                                    \
                     L3##_end = L3##_max;                                    \
                 while (L3##_start < L3##_max) {                             \
                     do { /* do nothing */ } while (0)
@@ -128,8 +135,8 @@ typedef enum TestFunc_Mask {
 
 #define TILING_INNER_LOOP_BEGIN(L1, L2)                                     \
     do {                                                                    \
-        for (L1## = L1##_start; L1## < L1##_end; ++##L1##) {                \
-            for (L2## = L2##_start; L2## < L2##_end; ++##L2##) {            \
+        for (L1 = L1##_start; L1 < L1##_end; ++L1) {                        \
+            for (L2 = L2##_start; L2 < L2##_end; ++L2) {                    \
                 do { /* do nothing */ } while (0)
 
 #define TILING_INNER_LOOP_END()                                             \
@@ -139,8 +146,8 @@ typedef enum TestFunc_Mask {
 
 #define TILING_INNER_LOOP_BEGIN_EX(L1, L2, S1, S2)                          \
     do {                                                                    \
-        for (L1## = L1##_start; L1## < L1##_end; L1## += S1) {              \
-            for (L2## = L2##_start; L2## < L2##_end; L2## += S2) {          \
+        for ( L1 = L1##_start; L1 < L1##_end; L1 += S1) {                   \
+            for ( L2 = L2##_start; L2 < L2##_end; L2 += S2) {               \
                 do { /* do nothing */ } while (0)
 
 #define TILING_INNER_LOOP_END_EX    TILING_INNER_LOOP_END
@@ -148,30 +155,30 @@ typedef enum TestFunc_Mask {
 /* 因为下面这些函数用了可选参数, 所以必须以C++的方式声明,                    */
 /* 如果想要在纯C环境下使用, 自己去掉可变参数就可以了(相应的要调整调用的代码) */
 
-float_t *matrix_malloc(unsigned int M, unsigned int N,
+cblas_float *matrix_malloc(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE);
 
-float_t *matrix_offset_malloc(unsigned int M, unsigned int N,
+cblas_float *matrix_offset_malloc(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE, unsigned int offset = 0);
 
-float_t *matrix_malloc_ex(unsigned int M, unsigned int N,
+cblas_float *matrix_malloc_ex(unsigned int M, unsigned int N,
             unsigned int alignment = DEFAULT_CACHELINE,
-            eMatrixInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
+            eMatrixInitFcn initFcn = MatInitZeros, cblas_float fillValue = 0.0,
             eMatrixItemOrder order = MatItemOrderAsc);
 
-void matrix_free(float_t *A);
+void matrix_free(cblas_float *A);
 
-void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
-        eMatrixInitFcn initFcn = MatInitZeros, float_t fillValue = 0.0,
+void matrix_init_elements(cblas_float *A, unsigned int M, unsigned int N,
+        eMatrixInitFcn initFcn = MatInitZeros, cblas_float fillValue = 0.0,
         eMatrixItemOrder order = MatItemOrderAsc);
 
-bool matrix_compare(const float_t *A, const float_t *B, unsigned int M, unsigned int N,
+bool matrix_compare(const cblas_float *A, const cblas_float *B, unsigned int M, unsigned int N,
         int *diff_nums = NULL, eMatrixItemOrder order = MatItemOrderAsc);
 
-bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
+bool matrix_transpose_verify(cblas_float *A, unsigned int M, unsigned int N,
         int *err_nums = NULL, eMatrixItemOrder order = MatItemOrderAsc);
 
-void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N);
+void matrix_fast_transpose_NxN(cblas_float *A, unsigned int M, unsigned int N);
 
 void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsigned int N);
 

@@ -19,6 +19,11 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
+#else
+
+#include <xmmintrin.h>
+#include <emmintrin.h>
+
 #endif  /* (_WIN32 || _WIN64) && _MSC_VER */
 
 #ifdef _MSC_VER

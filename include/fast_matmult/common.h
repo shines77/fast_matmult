@@ -31,6 +31,22 @@
 #define BLAS_REAL           0x0000U
 #define BLAS_COMPLEX        0x0004U
 
+#ifndef __MMX__
+#define __MMX__
+#endif
+
+#ifndef __SSE__
+#define __SSE__
+#endif
+
+#ifndef __SSE2__
+#define __SSE2__
+#endif
+
+#ifndef __SSE3__
+#define __SSE3__
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -160,11 +176,11 @@ extern "C" {
 #endif
 
 #ifndef _GCC_CDECL
-#define _GCC_CDECL          __attribute__((cdecl))
+#define _GCC_CDECL          __attribute__ ((__cdecl__))
 #endif
 
 #ifndef _GCC_FASTCALL
-#define _GCC_FASTCALL       __attribute__((fastcall))
+#define _GCC_FASTCALL       __attribute__ ((fastcall))
 #endif
 
 /* default call: __cdecl */

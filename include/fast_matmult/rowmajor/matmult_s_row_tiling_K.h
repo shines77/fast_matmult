@@ -17,16 +17,16 @@ extern "C" {
 
 void matmult_s_row_tiling_NxM_K(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 // ========================================================================
 
 void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned int N,
-                                       float_t *A, float_t *B, float_t *C);
+                                       cblas_float *A, cblas_float *B, cblas_float *C);
 
 // ========================================================================
 

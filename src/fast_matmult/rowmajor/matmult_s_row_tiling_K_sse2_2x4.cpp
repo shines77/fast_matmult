@@ -82,11 +82,11 @@ using namespace annlab;
 #endif
 
 void matmult_s_row_tiling_NxM_K_sse2_2x4(const int M, const int N, const int K,
-                                         const float_t alpha,
-                                         const float_t *A, const int lda,
-                                         const float_t *B, const int ldb,
-                                         const float_t beta,
-                                         float_t *C, const int ldc)
+                                         const cblas_float alpha,
+                                         const cblas_float *A, const int lda,
+                                         const cblas_float *B, const int ldb,
+                                         const cblas_float beta,
+                                         cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -95,8 +95,8 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
 
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
     m_step = 8;
@@ -645,11 +645,11 @@ L15:
 }
 
 void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const int K,
-                                                const float_t alpha,
-                                                const float_t *A, const int lda,
-                                                const float_t *B, const int ldb,
-                                                const float_t beta,
-                                                float_t *C, const int ldc)
+                                                const cblas_float alpha,
+                                                const cblas_float *A, const int lda,
+                                                const cblas_float *B, const int ldb,
+                                                const cblas_float beta,
+                                                cblas_float *C, const int ldc)
 {
     stop_watch sw;
     int m, n, k;
@@ -657,8 +657,8 @@ void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const 
     int n_start, n_end;
     int k_start, k_end;
     int m_step, n_step, k_step;
-    float_t *C_ = NULL, *B_, *A_;
-    float_t C_m_n;
+    cblas_float *C_ = NULL, *B_, *A_;
+    cblas_float C_m_n;
 
     //
     // matrix multiplication: C1 = A * B
@@ -670,7 +670,7 @@ void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const 
 
     // 先转置矩阵B
     sw.start();
-    matrix_fast_transpose_NxN((float_t *)B, K, N);
+    matrix_fast_transpose_NxN((cblas_float *)B, K, N);
     sw.stop();
 
     printf("Transpose elapsed time: %8.2f ms\n\n", sw.getMillisec());
@@ -725,8 +725,8 @@ void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const 
                     // C[m, n] need m_step * ((n_step * 8) / nPageSize) = m_step x 1 = 4 x 1 TLB entries.
                     for (n = n_start; n < n_end; ++n) {
     #if 1
-                        A_ = (float_t *)&A[m * K + k_start];
-                        B_ = (float_t *)&B[n * K + k_start];
+                        A_ = (cblas_float *)&A[m * K + k_start];
+                        B_ = (cblas_float *)&B[n * K + k_start];
                         //C_ = &C[m * N + n];
                         C_m_n = C[m * N + n];
 
@@ -791,8 +791,8 @@ void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const 
                     for (n = n_start; n < n_end; ++n) {
                     //for (m = m_start; m < m_end; ++m) {
     #if 1
-                        A_ = (float_t *)&A[m * K + k_start];
-                        B_ = (float_t *)&B[n * K + k_start];
+                        A_ = (cblas_float *)&A[m * K + k_start];
+                        B_ = (cblas_float *)&B[n * K + k_start];
                         //C_ = (float_t *)&C[m * N + n];
                         //C_m_n = (float_t)0.0;
                         C_m_n = C[m * N + n];
@@ -896,7 +896,7 @@ void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const 
 
     // 计算完以后再转置(还原)矩阵B
     sw.start();
-    matrix_fast_transpose_NxN((float_t *)B, N, K);
+    matrix_fast_transpose_NxN((cblas_float *)B, N, K);
     sw.stop();
 
     printf("Transpose elapsed time: %8.2f ms\n\n", sw.getMillisec());

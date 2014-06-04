@@ -15,11 +15,11 @@ extern "C" {
 void cblas_dgemm(const Cblas_Order order, const Cblas_Transpose transa,
                  const Cblas_Transpose transb,
                  const cblas_int m, const cblas_int n, const cblas_int k,
-                 const float_t *alpha,
-                 const float_t *a, const cblas_int lda,
-                 const float_t *b, const cblas_int ldb,
-                 const float_t *beta,
-                 float_t *c, const cblas_int ldc,
+                 const cblas_float *alpha,
+                 const cblas_float *a, const cblas_int lda,
+                 const cblas_float *b, const cblas_int ldb,
+                 const cblas_float *beta,
+                 cblas_float *c, const cblas_int ldc,
                  cblas_func gemm_func);
 
 #ifdef __cplusplus

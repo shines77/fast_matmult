@@ -22,69 +22,69 @@ extern "C" {
 
 void matmult_s_row_MxN_K(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 void matmult_s_row_NxM_K(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 void matmult_s_row_MxK_N(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 void matmult_s_row_KxM_N(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 void matmult_s_row_NxK_M(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 void matmult_s_row_KxN_M(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 // ========================================================================
 
 void matmult_s_row_MxN_K_transB(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 void matmult_s_row_NxM_K_transB(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 // ========================================================================
 

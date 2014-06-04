@@ -110,11 +110,11 @@
 __declspec(naked)
 void __CDECL
 gemm_kernel_2x4_penryn(const int m, const int n, const int k,
-                       const float_t alpha,
-                       const float_t *a, const int lda,
-                       const float_t *b, const int ldb,
-                       const float_t beta,
-                       float_t *c, const int ldc,
+                       const cblas_float alpha,
+                       const cblas_float *a, const int lda,
+                       const cblas_float *b, const int ldb,
+                       const cblas_float beta,
+                       cblas_float *c, const int ldc,
                        const int offset) _GCC_CDECL
 {
     __asm {
@@ -1541,13 +1541,13 @@ L999:
 #else  /* !((_WIN32 || _WIN64) && _MSC_VER) */
 
 // non-windows routine
-void __CDECL
+void __CDECL _GCC_CDECL
 gemm_kernel_2x4_penryn(const int M, const int N, const int K,
-                       const float_t alpha,
-                       const float_t *A, const int lda,
-                       const float_t *B, const int ldb,
-                       const float_t beta,
-                       float_t *C, const int ldc)
+                       const cblas_float alpha,
+                       const cblas_float *A, const int lda,
+                       const cblas_float *B, const int ldb,
+                       const cblas_float beta,
+                       cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -1556,9 +1556,9 @@ gemm_kernel_2x4_penryn(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
-    float_t A_m_k;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
+    cblas_float A_m_k;
 
     m_step = 4;
     k_step = 128;

@@ -72,11 +72,11 @@
 #endif
 
 void matmult_s_row_tiling_KxM_N_sse2_2x4(const int M, const int N, const int K,
-                                         const float_t alpha,
-                                         const float_t *A, const int lda,
-                                         const float_t *B, const int ldb,
-                                         const float_t beta,
-                                         float_t *C, const int ldc)
+                                         const cblas_float alpha,
+                                         const cblas_float *A, const int lda,
+                                         const cblas_float *B, const int ldb,
+                                         const cblas_float beta,
+                                         cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -85,9 +85,9 @@ void matmult_s_row_tiling_KxM_N_sse2_2x4(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
-    float_t A_m_k = (float_t)0.0;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
+    cblas_float A_m_k = (cblas_float)0.0;
 
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
     m_step = 8;
@@ -855,11 +855,11 @@ L01:
 #endif  /* USE_PREFETCH */
 
 void matmult_s_row_tiling_KxM_N_sse2_2x4_(const int M, const int N, const int K,
-                                         const float_t alpha,
-                                         const float_t *A, const int lda,
-                                         const float_t *B, const int ldb,
-                                         const float_t beta,
-                                         float_t *C, const int ldc)
+                                         const cblas_float alpha,
+                                         const cblas_float *A, const int lda,
+                                         const cblas_float *B, const int ldb,
+                                         const cblas_float beta,
+                                         cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -868,9 +868,9 @@ void matmult_s_row_tiling_KxM_N_sse2_2x4_(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
-    float_t A_m_k = (float_t)0.0;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
+    cblas_float A_m_k = (cblas_float)0.0;
 
 #if defined(USE_PREFETCH) && (USE_PREFETCH != 0)
     m_step = 64;

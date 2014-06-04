@@ -3,13 +3,13 @@
 
 /* 循环顺序: m, k - n */
 void matmult_s_row_MxK_N(const int M, const int N, const int K,
-                         const float_t alpha,
-                         const float_t *A, const int lda,
-                         const float_t *B, const int ldb,
-                         const float_t beta,
-                         float_t *C, const int ldc)
+                         const cblas_float alpha,
+                         const cblas_float *A, const int lda,
+                         const cblas_float *B, const int ldb,
+                         const cblas_float beta,
+                         cblas_float *C, const int ldc)
 {
-    float_t A_m_k;
+    cblas_float A_m_k;
     int m, n, k;
 
     for (m = 0; m < M; ++m) {
@@ -26,13 +26,13 @@ void matmult_s_row_MxK_N(const int M, const int N, const int K,
 
 /* 循环顺序: k, m - n */
 void matmult_s_row_KxM_N(const int M, const int N, const int K,
-                         const float_t alpha,
-                         const float_t *A, const int lda,
-                         const float_t *B, const int ldb,
-                         const float_t beta,
-                         float_t *C, const int ldc)
+                         const cblas_float alpha,
+                         const cblas_float *A, const int lda,
+                         const cblas_float *B, const int ldb,
+                         const cblas_float beta,
+                         cblas_float *C, const int ldc)
 {
-    float_t A_m_k;
+    cblas_float A_m_k;
     int m, n, k;
 
     for (k = 0; k < K; ++k) {
@@ -49,18 +49,18 @@ void matmult_s_row_KxM_N(const int M, const int N, const int K,
 
 /* 循环顺序: m, n - k */
 void matmult_s_row_MxN_K(const int M, const int N, const int K,
-                         const float_t alpha,
-                         const float_t *A, const int lda,
-                         const float_t *B, const int ldb,
-                         const float_t beta,
-                         float_t *C, const int ldc)
+                         const cblas_float alpha,
+                         const cblas_float *A, const int lda,
+                         const cblas_float *B, const int ldb,
+                         const cblas_float beta,
+                         cblas_float *C, const int ldc)
 {
-    float_t C_m_n;
+    cblas_float C_m_n;
     int m, n, k;
 
     for (m = 0; m < M; ++m) {
         for (n = 0; n < N; ++n) {
-            C_m_n = (float_t)0.0;
+            C_m_n = (cblas_float)0.0;
             for (k = 0; k < K; ++k) {
                 // C[m, n] += A[m, k] * B[k, n];
                 C_m_n += A[m * K + k] * B[k * N + n];
@@ -72,18 +72,18 @@ void matmult_s_row_MxN_K(const int M, const int N, const int K,
 
 /* 循环顺序: n, m - k */
 void matmult_s_row_NxM_K(const int M, const int N, const int K,
-                         const float_t alpha,
-                         const float_t *A, const int lda,
-                         const float_t *B, const int ldb,
-                         const float_t beta,
-                         float_t *C, const int ldc)
+                         const cblas_float alpha,
+                         const cblas_float *A, const int lda,
+                         const cblas_float *B, const int ldb,
+                         const cblas_float beta,
+                         cblas_float *C, const int ldc)
 {
-    float_t C_m_n;
+    cblas_float C_m_n;
     int m, n, k;
 
     for (n = 0; n < N; ++n) {
         for (m = 0; m < M; ++m) {
-            C_m_n = (float_t)0.0;
+            C_m_n = (cblas_float)0.0;
             for (k = 0; k < K; ++k) {
                 // C[m, n] += A[m, k] * B[k, n];
                 C_m_n += A[m * K + k] * B[k * N + n];
@@ -95,13 +95,13 @@ void matmult_s_row_NxM_K(const int M, const int N, const int K,
 
 /* 循环顺序: k, n - m */
 void matmult_s_row_KxN_M(const int M, const int N, const int K,
-                         const float_t alpha,
-                         const float_t *A, const int lda,
-                         const float_t *B, const int ldb,
-                         const float_t beta,
-                         float_t *C, const int ldc)
+                         const cblas_float alpha,
+                         const cblas_float *A, const int lda,
+                         const cblas_float *B, const int ldb,
+                         const cblas_float beta,
+                         cblas_float *C, const int ldc)
 {
-    float_t B_k_n;
+    cblas_float B_k_n;
     int m, n, k;
 
     for (k = 0; k < K; ++k) {
@@ -118,13 +118,13 @@ void matmult_s_row_KxN_M(const int M, const int N, const int K,
 
 /* 循环顺序: n, k - m */
 void matmult_s_row_NxK_M(const int M, const int N, const int K,
-                         const float_t alpha,
-                         const float_t *A, const int lda,
-                         const float_t *B, const int ldb,
-                         const float_t beta,
-                         float_t *C, const int ldc)
+                         const cblas_float alpha,
+                         const cblas_float *A, const int lda,
+                         const cblas_float *B, const int ldb,
+                         const cblas_float beta,
+                         cblas_float *C, const int ldc)
 {
-    float_t B_k_n;
+    cblas_float B_k_n;
     int m, n, k;
 
     for (n = 0; n < N; ++n) {
@@ -141,22 +141,22 @@ void matmult_s_row_NxK_M(const int M, const int N, const int K,
 
 /* 循环顺序: m, n - k */
 void matmult_s_row_MxN_K_transB(const int M, const int N, const int K,
-                                const float_t alpha,
-                                const float_t *A, const int lda,
-                                const float_t *B, const int ldb,
-                                const float_t beta,
-                                float_t *C, const int ldc)
+                                const cblas_float alpha,
+                                const cblas_float *A, const int lda,
+                                const cblas_float *B, const int ldb,
+                                const cblas_float beta,
+                                cblas_float *C, const int ldc)
 {
-    float_t C_m_n;
+    cblas_float C_m_n;
     int m, n, k;
 
     // 先转置矩阵B
-    matrix_fast_transpose_NxN((float_t *)B, K, N);
+    matrix_fast_transpose_NxN((cblas_float *)B, K, N);
 
     // 循环顺序: m, n - k
     for (m = 0; m < M; ++m) {
         for (n = 0; n < N; ++n) {
-            C_m_n = (float_t)0.0;
+            C_m_n = (cblas_float)0.0;
             for (k = 0; k < K; ++k) {
                 // C[m, n] += A[m, k] * B'[k, n];
                 C_m_n += A[m * K + k] * B[n * K + k];
@@ -166,27 +166,27 @@ void matmult_s_row_MxN_K_transB(const int M, const int N, const int K,
     }
 
     // 计算完以后再转置(还原)矩阵B
-    matrix_fast_transpose_NxN((float_t *)B, N, K);
+    matrix_fast_transpose_NxN((cblas_float *)B, N, K);
 }
 
 /* 循环顺序: n, m - k */
 void matmult_s_row_NxM_K_transB(const int M, const int N, const int K,
-                                const float_t alpha,
-                                const float_t *A, const int lda,
-                                const float_t *B, const int ldb,
-                                const float_t beta,
-                                float_t *C, const int ldc)
+                                const cblas_float alpha,
+                                const cblas_float *A, const int lda,
+                                const cblas_float *B, const int ldb,
+                                const cblas_float beta,
+                                cblas_float *C, const int ldc)
 {
-    float_t C_m_n;
+    cblas_float C_m_n;
     int m, n, k;
 
     // 先转置矩阵B
-    matrix_fast_transpose_NxN((float_t *)B, K, N);
+    matrix_fast_transpose_NxN((cblas_float *)B, K, N);
 
     // 循环顺序: n, m - k
     for (n = 0; n < N; ++n) {
         for (m = 0; m < M; ++m) {
-            C_m_n = (float_t)0.0;
+            C_m_n = (cblas_float)0.0;
             for (k = 0; k < K; ++k) {
                 // C[m, n] += A[m, k] * B'[k, n];
                 C_m_n += A[m * K + k] * B[n * K + k];
@@ -196,5 +196,5 @@ void matmult_s_row_NxM_K_transB(const int M, const int N, const int K,
     }
 
     // 计算完以后再转置(还原)矩阵B
-    matrix_fast_transpose_NxN((float_t *)B, N, K);
+    matrix_fast_transpose_NxN((cblas_float *)B, N, K);
 }

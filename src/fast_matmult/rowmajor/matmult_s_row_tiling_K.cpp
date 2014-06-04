@@ -2,11 +2,11 @@
 #include <fast_matmult/rowmajor/matmult_s_row_tiling_K.h>
 
 void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
-                                const float_t alpha,
-                                const float_t *A, const int lda,
-                                const float_t *B, const int ldb,
-                                const float_t beta,
-                                float_t *C, const int ldc)
+                                const cblas_float alpha,
+                                const cblas_float *A, const int lda,
+                                const cblas_float *B, const int ldb,
+                                const cblas_float beta,
+                                cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -15,9 +15,9 @@ void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
+    const cblas_float *A_, *B_;
     //float_t *C_;
-    float_t C_m_n;
+    cblas_float C_m_n;
 
     m_step = 4;
     k_step = 128;
@@ -49,7 +49,7 @@ void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
             B_ = &B[k_start * ldb + n];
             //C_ = &C[m * ldc + n];
 
-            C_m_n = (float_t)0.0;
+            C_m_n = (cblas_float)0.0;
 
             // ×îÄÚ²ãÑ­»·: k
             for (k = k_start; k < k_end; ++k) {
@@ -68,15 +68,15 @@ void matmult_s_row_tiling_NxM_K(const int M, const int N, const int K,
 }
 
 void matmult_s_row_tiling_MxN_K_transB(unsigned int M, unsigned int K, unsigned int N,
-                                       float_t *A, float_t *B, float_t *C)
+                                       cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m_start, m_end;
     unsigned int n_start, n_end;
     unsigned int k_start, k_end;
     unsigned int m_step, n_step, k_step;
-    float_t *C_ = NULL, *B_, *A_;
-    float_t C_m_n;
+    cblas_float *C_ = NULL, *B_, *A_;
+    cblas_float C_m_n;
 
     //
     // matrix multiplication: C1 = A * B

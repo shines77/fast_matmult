@@ -2,11 +2,11 @@
 #include <fast_matmult/rowmajor/matmult_s_row_tiling_N.h>
 
 void matmult_s_row_tiling_MxK_N(const int M, const int N, const int K,
-                                const float_t alpha,
-                                const float_t *A, const int lda,
-                                const float_t *B, const int ldb,
-                                const float_t beta,
-                                float_t *C, const int ldc)
+                                const cblas_float alpha,
+                                const cblas_float *A, const int lda,
+                                const cblas_float *B, const int ldb,
+                                const cblas_float beta,
+                                cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -15,9 +15,9 @@ void matmult_s_row_tiling_MxK_N(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
-    float_t A_m_k;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
+    cblas_float A_m_k;
 
     m_step = 4;
     k_step = 128;
@@ -65,11 +65,11 @@ void matmult_s_row_tiling_MxK_N(const int M, const int N, const int K,
 }
 
 void matmult_s_row_tiling_KxM_N(const int M, const int N, const int K,
-                                const float_t alpha,
-                                const float_t *A, const int lda,
-                                const float_t *B, const int ldb,
-                                const float_t beta,
-                                float_t *C, const int ldc)
+                                const cblas_float alpha,
+                                const cblas_float *A, const int lda,
+                                const cblas_float *B, const int ldb,
+                                const cblas_float beta,
+                                cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -78,9 +78,9 @@ void matmult_s_row_tiling_KxM_N(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
-    float_t A_m_k;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
+    cblas_float A_m_k;
 
     m_step = 4;
     k_step = 128;
@@ -128,11 +128,11 @@ void matmult_s_row_tiling_KxM_N(const int M, const int N, const int K,
 }
 
 void matmult_s_row_tiling_k_n_m_KxM_N(const int M, const int N, const int K,
-                                      const float_t alpha,
-                                      const float_t *A, const int lda,
-                                      const float_t *B, const int ldb,
-                                      const float_t beta,
-                                      float_t *C, const int ldc)
+                                      const cblas_float alpha,
+                                      const cblas_float *A, const int lda,
+                                      const cblas_float *B, const int ldb,
+                                      const cblas_float beta,
+                                      cblas_float *C, const int ldc)
 {
     int m, n, k;
     int m_start, m_end;
@@ -141,9 +141,9 @@ void matmult_s_row_tiling_k_n_m_KxM_N(const int M, const int N, const int K,
     int m_max, n_max, k_max;
     int m_step, n_step, k_step;
 
-    const float_t *A_, *B_;
-    float_t *C_;
-    float_t A_m_k;
+    const cblas_float *A_, *B_;
+    cblas_float *C_;
+    cblas_float A_m_k;
 
     m_step = 4;
     k_step = 128;

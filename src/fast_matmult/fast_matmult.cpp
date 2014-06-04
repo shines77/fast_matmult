@@ -38,27 +38,27 @@ using namespace annlab;
 #define MIN(a, b)       (((a) < (b)) ? (a) : (b))
 #define MAX(a, b)       (((a) > (b)) ? (a) : (b))
 
-float_t *matrix_malloc(unsigned int M, unsigned int N,
+cblas_float *matrix_malloc(unsigned int M, unsigned int N,
                        unsigned int alignment /* = DEFAULT_CACHELINE */)
 {
-    return (float_t *)::_aligned_malloc(M * N * sizeof(float_t), alignment);
+    return (cblas_float *)::_aligned_malloc(M * N * sizeof(cblas_float), alignment);
 }
 
-float_t *matrix_offset_malloc(unsigned int M, unsigned int N,
+cblas_float *matrix_offset_malloc(unsigned int M, unsigned int N,
                               unsigned int alignment /* = DEFAULT_CACHELINE */,
                               unsigned int offset /* = 0 */)
 {
-    return (float_t *)::_aligned_offset_malloc(M * N * sizeof(float_t), alignment, offset);
+    return (cblas_float *)::_aligned_offset_malloc(M * N * sizeof(cblas_float), alignment, offset);
 }
 
-float_t *matrix_malloc_ex(unsigned int M, unsigned int N,
+cblas_float *matrix_malloc_ex(unsigned int M, unsigned int N,
                           unsigned int alignment,
                           eMatrixInitFcn initFcn /* = MatInitZeros */,
-                          float_t fillValue /* = 0.0 */,
+                          cblas_float fillValue /* = 0.0 */,
                           eMatrixItemOrder order /* = MatItemOrderAsc */)
 {
-    float_t *A;
-    A = (float_t *)::_aligned_malloc(M * N * sizeof(float_t), alignment);
+    cblas_float *A;
+    A = (cblas_float *)::_aligned_malloc(M * N * sizeof(cblas_float), alignment);
     if (A != NULL) {
         // init elements
         matrix_init_elements(A, M, N, initFcn, fillValue, order);
@@ -66,14 +66,14 @@ float_t *matrix_malloc_ex(unsigned int M, unsigned int N,
     return A;
 }
 
-void matrix_free(float_t *A)
+void matrix_free(cblas_float *A)
 {
     ::_aligned_free((void *)A);
 }
 
-void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
+void matrix_init_elements(cblas_float *A, unsigned int M, unsigned int N,
                           eMatrixInitFcn initFcn /* = MatInitZeros */,
-                          float_t fillValue /* = 0.0 */,
+                          cblas_float fillValue /* = 0.0 */,
                           eMatrixItemOrder order /* = MatItemOrderAsc */)
 {
     unsigned int m, n;
@@ -83,7 +83,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
         for (n = 0; n < N; ++n) {
             for (m = 0; m < M; ++m) {
                 index = n * M + m;
-                A[index] = (float_t)0.0;
+                A[index] = (cblas_float)0.0;
             }
         }
     }
@@ -91,7 +91,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
         for (n = 0; n < N; ++n) {
             for (m = 0; m < M; ++m) {
                 index = n * M + m;
-                A[index] = (float_t)1.0;
+                A[index] = (cblas_float)1.0;
             }
         }
     }
@@ -99,7 +99,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
         for (n = 0; n < N; ++n) {
             for (m = 0; m < M; ++m) {
                 index = n * M + m;
-                A[index] = (float_t)(::rand() / (float_t)RAND_MAX * (float_t)2.0 - (float_t)1.0);
+                A[index] = (cblas_float)(::rand() / (cblas_float)RAND_MAX * (cblas_float)2.0 - (cblas_float)1.0);
             }
         }
     }
@@ -107,7 +107,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
         for (n = 0; n < N; ++n) {
             for (m = 0; m < M; ++m) {
                 index = n * M + m;
-                A[index] = (float_t)(::rand() / (float_t)RAND_MAX);
+                A[index] = (cblas_float)(::rand() / (cblas_float)RAND_MAX);
             }
         }
     }
@@ -116,7 +116,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
             for (n = 0; n < N; ++n) {
                 for (m = 0; m < M; ++m) {
                     index = n * M + m;
-                    A[index] = (float_t)index;
+                    A[index] = (cblas_float)index;
                 }
             }
         }
@@ -125,7 +125,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
                 for (m = 0; m < M; ++m) {
                     index = n * M + m;
                     value = m * N + n;
-                    A[index] = (float_t)value;
+                    A[index] = (cblas_float)value;
                 }
             }
         }
@@ -137,7 +137,7 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
         for (n = 0; n < N; ++n) {
             for (m = 0; m < M; ++m) {
                 index = n * M + m;
-                A[index] = (float_t)fillValue;
+                A[index] = (cblas_float)fillValue;
             }
         }
     }
@@ -146,14 +146,14 @@ void matrix_init_elements(float_t *A, unsigned int M, unsigned int N,
     }
 }
 
-bool matrix_compare(const float_t *A, const float_t *B, unsigned int M, unsigned int N,
+bool matrix_compare(const cblas_float *A, const cblas_float *B, unsigned int M, unsigned int N,
                     int *diff_nums /* = NULL */,
                     eMatrixItemOrder order /* = MatItemOrderAsc */)
 {
     bool cmp_result = false;
     const double err_epsilon = FLOAT_T_EPSINON_TEST;
     unsigned int m, n;
-    float_t cell_val1, cell_val2;
+    cblas_float cell_val1, cell_val2;
     int diff_cnt;
     if (order == MatItemOrderAsc) {
         diff_cnt = 0;
@@ -187,14 +187,14 @@ bool matrix_compare(const float_t *A, const float_t *B, unsigned int M, unsigned
     return cmp_result;
 }
 
-bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
+bool matrix_transpose_verify(cblas_float *A, unsigned int M, unsigned int N,
                              int *err_nums /* = NULL */,
                              eMatrixItemOrder order /* = MatItemOrderAsc */)
 {
     bool verify_ok = false;
     const double err_epsilon = FLOAT_T_EPSILON;
     unsigned int m, n;
-    float_t cell_val;
+    cblas_float cell_val;
     int index, err_cnt;
 
     if (order == MatItemOrderAsc) {
@@ -203,7 +203,7 @@ bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
             for (m = 0; m < M; ++m) {
                 cell_val = A[n * M + m];
                 index = n * M + m;
-                if (::fabs(cell_val - (float_t)index) > err_epsilon)
+                if (::fabs(cell_val - (cblas_float)index) > err_epsilon)
                     err_cnt++;
             }
         }
@@ -216,7 +216,7 @@ bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
             for (m = 0; m < M; ++m) {
                 cell_val = A[n * M + m];
                 index = m * N + n;
-                if (::fabs(cell_val - (float_t)index) > err_epsilon)
+                if (::fabs(cell_val - (cblas_float)index) > err_epsilon)
                     err_cnt++;
             }
         }
@@ -232,14 +232,14 @@ bool matrix_transpose_verify(float_t *A, unsigned int M, unsigned int N,
     return verify_ok;
 }
 
-void matrix_fast_transpose_NxN(float_t *A, unsigned int M, unsigned int N)
+void matrix_fast_transpose_NxN(cblas_float *A, unsigned int M, unsigned int N)
 {
     unsigned int m, n;
     unsigned int m_start, m_end;
     unsigned int n_start, n_end;
     unsigned int m_step, n_step;
     //unsigned int n_start_min = 0, n_start_max = 0;
-    float_t temp1, temp2;
+    cblas_float temp1, temp2;
 
     m_step = 128;
     n_step = 128;
@@ -296,9 +296,9 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     char *verify_result[2] = { "error", "ok"   };
     char *verify_bool[2]   = { "false", "true" };
 
-    float_t *A, *B, *C1, *C2, *C3, *C4;
-    float_t *tmp1, *tmp2;;
-    float_t alpha = 1.0, beta = 0.0;
+    cblas_float *A, *B, *C1, *C2, *C3, *C4;
+    cblas_float *tmp1, *tmp2;;
+    cblas_float alpha = 1.0, beta = 0.0;
 
 #if defined(LANG_ID) && (LANG_ID != LANG_ZH_CN)
     printf("matrix_matmult_test() start...\n\n");
@@ -337,7 +337,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         total_offset_cnt = total_matrix_cnt * (total_matrix_cnt - 1) / 2 + 2;
     else
         total_offset_cnt = 2;
-    size_t alloc_size = (M * K + K * N + M * N * 4) * sizeof(float_t) + addr_offset * total_offset_cnt;
+    size_t alloc_size = (M * K + K * N + M * N * 4) * sizeof(cblas_float) + addr_offset * total_offset_cnt;
     void *map_address = NULL;
     int matrix_idx = total_matrix_cnt - 1;
     char *tmp_address;
@@ -346,32 +346,32 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
     if (map_address) {
         printf("map_address = 0x%08X, alloc_size = 0x%08X (%d) byte(s).\n\n", map_address, alloc_size, alloc_size);
         tmp_address = (char *)map_address;
-        A  = (float_t *)tmp_address + addr_offset * matrix_idx;
+        A  = (cblas_float *)tmp_address + addr_offset * matrix_idx;
         matrix_idx--;
         if (matrix_idx < 0) matrix_idx = 0;
 
-        tmp_address += M * K * sizeof(float_t) + addr_offset * matrix_idx;
-        B  = (float_t *)tmp_address;
+        tmp_address += M * K * sizeof(cblas_float) + addr_offset * matrix_idx;
+        B  = (cblas_float *)tmp_address;
         matrix_idx--;
         if (matrix_idx < 0) matrix_idx = 0;
 
-        tmp_address += K * N * sizeof(float_t) + addr_offset * matrix_idx;
-        C1 = (float_t *)tmp_address;
+        tmp_address += K * N * sizeof(cblas_float) + addr_offset * matrix_idx;
+        C1 = (cblas_float *)tmp_address;
         //matrix_idx--;
 
-        tmp_address += M * N * sizeof(float_t) + addr_offset * matrix_idx;
-        C2 = (float_t *)tmp_address;
+        tmp_address += M * N * sizeof(cblas_float) + addr_offset * matrix_idx;
+        C2 = (cblas_float *)tmp_address;
         //matrix_idx--;
 
-        tmp_address += M * N * sizeof(float_t) + addr_offset * matrix_idx;
-        C3 = (float_t *)tmp_address;
+        tmp_address += M * N * sizeof(cblas_float) + addr_offset * matrix_idx;
+        C3 = (cblas_float *)tmp_address;
         //matrix_idx--;
 
-        tmp_address += M * N * sizeof(float_t) + addr_offset * matrix_idx;
-        C4 = (float_t *)tmp_address;
+        tmp_address += M * N * sizeof(cblas_float) + addr_offset * matrix_idx;
+        C4 = (cblas_float *)tmp_address;
         //matrix_idx--;
 
-        tmp_address += M * N * sizeof(float_t) + addr_offset * matrix_idx;
+        tmp_address += M * N * sizeof(cblas_float) + addr_offset * matrix_idx;
 
         ::fflush(stdout);
 
@@ -1022,12 +1022,12 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         /*************************************
          *     gemm_kernel_2x4_penryn()      *
          *************************************/
-        float_t *C3b = C4;
+        cblas_float *C3b = C4;
         matrix_init_elements(C3b, M, N, MatInitZeros);
 
         // 先转置矩阵A
         //matrix_fast_transpose_NxN((float_t *)A, M, K);
-        matrix_fast_transpose_NxN((float_t *)B, K, N);
+        matrix_fast_transpose_NxN((cblas_float *)B, K, N);
 
         stopWatch.start();
         //gemm_kernel_2x4_penryn(M, N, K, alpha, A, K, B, N, beta, C3b, N, 0);
@@ -1037,9 +1037,9 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
 
         // 计算完以后再转置(还原)矩阵A
         //matrix_fast_transpose_NxN((float_t *)A, K, M);
-        matrix_fast_transpose_NxN((float_t *)B, N, K);
+        matrix_fast_transpose_NxN((cblas_float *)B, N, K);
 
-        matrix_fast_transpose_NxN((float_t *)C4, N, M);
+        matrix_fast_transpose_NxN((cblas_float *)C4, N, M);
 
         //C3 -= M * N;
         diff_nums = 0;

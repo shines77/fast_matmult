@@ -68,8 +68,10 @@ IcUpdateLog.htm
 # tmp and obj files
 /obj
 /gen
+/build
 /tmp
 /temp
+*.save
 
 # For Visual Studio C# files on Windows
 .cache

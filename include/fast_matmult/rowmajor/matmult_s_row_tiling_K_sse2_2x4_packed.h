@@ -15,11 +15,11 @@ extern "C" {
 
 void matmult_s_row_tiling_NxM_K_sse2_2x4_packed(
     const int M, const int N, const int K,
-    const float_t alpha,
-    const float_t *A, const int lda,
-    const float_t *B, const int ldb,
-    const float_t beta,
-    float_t *C, const int ldc);
+    const cblas_float alpha,
+    const cblas_float *A, const int lda,
+    const cblas_float *B, const int ldb,
+    const cblas_float beta,
+    cblas_float *C, const int ldc);
 
 #ifdef __cplusplus
 }

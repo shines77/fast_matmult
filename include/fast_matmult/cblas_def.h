@@ -23,22 +23,22 @@ extern "C" {
 #define CBLAS_USE_DOUBLE        1
 
 #if defined(CBLAS_USE_DOUBLE) && (CBLAS_USE_DOUBLE != 0)
-    #ifndef FLOAT_T
-        #define FLOAT_T             double
+    #ifndef CBLAS_FLOAT
+        #define CBLAS_FLOAT         cblas_float
     #endif
     #define FLOAT_T_EPSILON         DOUBLE_EPSINON
     #define FLOAT_T_EPSINON_TEST    DOUBLE_EPSINON_TEST
-    typedef double float_t;
+    typedef double cblas_float;
 #else
-    #ifndef FLOAT_T
-        #define FLOAT_T             float
+    #ifndef CBLAS_FLOAT
+        #define CBLAS_FLOAT         cblas_float
     #endif
     #define FLOAT_T_EPSILON         FLOAT_EPSINON
     #define FLOAT_T_EPSINON_TEST    FLOAT_EPSINON_TEST
-    typedef float float_t;
+    typedef float cblas_float;
 #endif
 
-typedef int cblas_int;
+typedef int  cblas_int;
 typedef long cblas_long;
 
 typedef struct cblas_arg_t {
@@ -120,14 +120,14 @@ typedef enum eMatrixInitFcn {
     MatInitFcnMax
 } eMatrixInitFcn;
 
-typedef void (*cblas_func) (int mode, cblas_arg_t *args, const float_t *sa, const float_t *sb, long dummy);
+typedef void (*cblas_func) (int mode, cblas_arg_t *args, const cblas_float *sa, const cblas_float *sb, long dummy);
 
 typedef void (*cblas_gemm_func) (const cblas_int m, const cblas_int n, const cblas_int k,
-                                 const float_t alpha,
-                                 const float_t *a, const cblas_int lda,
-                                 const float_t *b, const cblas_int ldb,
-                                 const float_t beta,
-                                 float_t *c, const cblas_int ldc);
+                                 const cblas_float alpha,
+                                 const cblas_float *a, const cblas_int lda,
+                                 const cblas_float *b, const cblas_int ldb,
+                                 const cblas_float beta,
+                                 cblas_float *c, const cblas_int ldc);
 
 #ifdef __cplusplus
 }

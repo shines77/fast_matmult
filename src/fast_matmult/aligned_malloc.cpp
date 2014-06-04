@@ -1,8 +1,14 @@
 
-#include <crtdbg.h>
 #include <malloc.h>
 #include <memory.h>
 #include <errno.h>
+
+#ifdef _MSC_VER
+#include <crtdbg.h>
+#else
+#define _ASSERT(expr)  ((void)0)
+#define _ASSERTE(expr) ((void)0)
+#endif
 
 #include <fast_matmult/aligned_malloc.h>
 
@@ -56,7 +62,7 @@ static unsigned char s_cCleanLandFill  = 0xCD;   /* fill new objects with this *
 *
 *******************************************************************************/
 extern "C"
-static bool __cdecl _iso_check_bytes(
+bool __cdecl _iso_check_bytes(
         unsigned char *pb,
         unsigned char bCheck,
         size_t nSize
@@ -83,7 +89,7 @@ static bool __cdecl _iso_check_bytes(
 //
 
 extern "C"
-static size_t __cdecl iso_next_power_of_2(size_t x)
+size_t __cdecl iso_next_power_of_2(size_t x)
 {
 #if 1
     if (x == 0)

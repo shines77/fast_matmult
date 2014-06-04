@@ -288,8 +288,10 @@ int main(int argc, char *argv[])
     // 获取用户输入的程序运行模式routine_mode
     routine_mode = 3;
     //routine_mode = get_routine_mode(3);
-    if (routine_mode == GETCH_EXIT_PROGRAM)
-        goto _EXIT_MAIN;
+    if (routine_mode == GETCH_EXIT_PROGRAM) {
+        return 0;
+        //goto L_EXIT_MAIN;
+    }
 
 #if 1
 
@@ -305,11 +307,17 @@ int main(int argc, char *argv[])
     }
 
 	printf("Dim = ? ");
+#ifdef _MSC_VER
 	scanf_s("%u", &n);
+#else
+    scanf("%u", &n);
+#endif
     printf("\n");
 
-	if (n == 0)
-		goto _EXIT_MAIN;
+	if (n == 0) {
+	    return 0;
+		//goto L_EXIT_MAIN;
+    }
 
     // n round to power of 2
     n = _next_power_of_2(n);
@@ -405,7 +413,7 @@ int main(int argc, char *argv[])
     huge_tlb_exit(echo);
     printf("\n");
 
-_EXIT_MAIN:
+L_EXIT_MAIN:
     system("pause");
     return 0;
 }

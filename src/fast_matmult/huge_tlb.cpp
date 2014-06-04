@@ -232,13 +232,20 @@ HUGE_TLB_CLOSE_TOKEN:
   the physical pages aren't actually allocated until you access the memory.
   Since very large pages have special physical memory requirements, the physical
   allocation is done up front so that the memory manager knows that when it comes
-  time to produce the memory on demand, it can actually do so. 
+  time to produce the memory on demand, it can actually do so.
  ************************************************************************************/
 
 void *huge_tlb_malloc(size_t size, size_t *real_alloc_size)
 {
     return huge_tlb_malloc_ex(NULL, size, real_alloc_size);
 }
+
+#ifndef _MSC_VER
+
+#define MEM_LARGE_PAGES  0x20000000
+#define MEM_4MB_PAGES    0x80000000
+
+#endif
 
 void *huge_tlb_malloc_ex(void *base_address, size_t size, size_t *real_alloc_size)
 {

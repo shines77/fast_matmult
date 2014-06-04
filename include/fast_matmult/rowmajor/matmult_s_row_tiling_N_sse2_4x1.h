@@ -15,11 +15,11 @@ extern "C" {
 
 void __CDECL
 matmult_s_row_tiling_N_sse2_4x1(const int m, const int n, const int k,
-                                const float_t *alpha,
-                                const float_t *a, const int lda,
-                                const float_t *b, const int ldb,
-                                const float_t *beta,
-                                float_t *c, const int ldc);
+                                const cblas_float *alpha,
+                                const cblas_float *a, const int lda,
+                                const cblas_float *b, const int ldb,
+                                const cblas_float *beta,
+                                cblas_float *c, const int ldc);
 
 #ifdef __cplusplus
 }

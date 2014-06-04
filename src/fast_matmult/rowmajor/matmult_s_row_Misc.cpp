@@ -136,27 +136,27 @@ void tiling_ounter_loop_sample(int M, int N, int K)
 }
 
 void serial_matmult(unsigned int M, unsigned int K, unsigned int N,
-                    float_t *A, float_t *B, float_t *C)
+                    cblas_float *A, cblas_float *B, cblas_float *C)
 {
-    float_t tempA;
+    cblas_float tempA;
     unsigned int m, k, n;
-    register float_t *A_ptr;
-    register float_t *C_ptr, *B_ptr;
+    register cblas_float *A_ptr;
+    register cblas_float *C_ptr, *B_ptr;
     for (m = 0; m < M; ++m) {
         for (n = 0; n < N; ++n) {
             // C[m][n] = 0.0;
-            C[m * N + n] = (float_t)0.0;
+            C[m * N + n] = (cblas_float)0.0;
         }
         // A_ptr = &A[m][0];
-        A_ptr = (float_t *)&(A[m * K + 0]);
+        A_ptr = (cblas_float *)&(A[m * K + 0]);
         for (k = 0; k < K; ++k) {
             // tempA = A[m][k];
             tempA = *(A_ptr + k);
             //tempA = A[m * K + k];
             //if (tempA > (float_t)FLOAT_T_EPSILON || tempA < (float_t)-FLOAT_T_EPSILON) {
-            if (fabs(tempA) > (float_t)FLOAT_T_EPSILON) {
-                C_ptr = (float_t *)&(C[m * N + 0]);
-                B_ptr = (float_t *)&(B[k * N + 0]);
+            if (fabs(tempA) > (cblas_float)FLOAT_T_EPSILON) {
+                C_ptr = (cblas_float *)&(C[m * N + 0]);
+                B_ptr = (cblas_float *)&(B[k * N + 0]);
 
                 for (n = 0; n < N; ++n) {
                     // C[m * N + n] += tempA * B[k * N + n];
@@ -169,25 +169,25 @@ void serial_matmult(unsigned int M, unsigned int K, unsigned int N,
 }
 
 void serial_matmult_sse(unsigned int M, unsigned int K, unsigned int N,
-                        float_t *A, float_t *B, float_t *C)
+                        cblas_float *A, cblas_float *B, cblas_float *C)
 {
 #if 1
-    float_t temp;
+    cblas_float temp;
     unsigned int m, k, n;
-    register float_t *A_ptr;
-    register float_t *C_ptr, *B_ptr;
+    register cblas_float *A_ptr;
+    register cblas_float *C_ptr, *B_ptr;
     for (m = 0; m < M; ++m) {
         for (n = 0; n < N; ++n) {
             // C[m][n] = 0.0;
-            C[m * N + n] = (float_t)0.0;
+            C[m * N + n] = (cblas_float)0.0;
         }
-        A_ptr = (float_t *)&(A[m * K]);
+        A_ptr = (cblas_float *)&(A[m * K]);
         for (k = 0; k < K; ++k) {
             temp = *(A_ptr + k);
             //if (temp > (float_t)FLOAT_T_EPSILON || temp < (float_t)-FLOAT_T_EPSILON) {
-            if (fabs(temp) > (float_t)FLOAT_T_EPSILON) {
-                C_ptr = (float_t *)&(C[m * N]);
-                B_ptr = (float_t *)&(B[k * N]);
+            if (fabs(temp) > (cblas_float)FLOAT_T_EPSILON) {
+                C_ptr = (cblas_float *)&(C[m * N]);
+                B_ptr = (cblas_float *)&(B[k * N]);
 
 #if (_MULT_SSE2_MODE == 1)
                 for (n = 0; n < N; ++n) {
@@ -351,7 +351,7 @@ void serial_matmult_sse(unsigned int M, unsigned int K, unsigned int N,
         for (k = 0; k < K; ++k) {
             temp = A[m * K + k];
             //if (temp > (float_t)DOUBLE_EPSINON || temp < (float_t)-DOUBLE_EPSINON) {
-            if (fabs(temp) > (float_t)DOUBLE_EPSINON) {
+            if (fabs(temp) > (cblas_float)DOUBLE_EPSINON) {
                 for (n = 0; n < N; ++n)
                     C[m * N + n] += temp * B[k * N + n];
             }
@@ -360,19 +360,21 @@ void serial_matmult_sse(unsigned int M, unsigned int K, unsigned int N,
 #endif
 }
 
+#ifdef _MSC_VER
+
 #define L1_DCACHE_LINESIZE      64
-#define STEP                    (L1_DCACHE_LINESIZE / sizeof(float_t))
+#define STEP                    (L1_DCACHE_LINESIZE / sizeof(cblas_float))
 
 void matmult_s_tiling_sse2_0(unsigned int M, unsigned int K, unsigned int N,
-                             float_t *A, float_t *B, float_t *C)
+                             cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m2, n2, k2;
     //unsigned int m_step, n_step, k_step;
-    float_t *mul1, *mul2, *res;
-    float_t *RESTRICT rres;
-    float_t *RESTRICT rmul1;
-    float_t *RESTRICT rmul2;
+    cblas_float *mul1, *mul2, *res;
+    cblas_float *RESTRICT rres;
+    cblas_float *RESTRICT rmul1;
+    cblas_float *RESTRICT rmul2;
 
     mul1 = A;
     mul2 = B;
@@ -399,15 +401,15 @@ void matmult_s_tiling_sse2_0(unsigned int M, unsigned int K, unsigned int N,
 }
 
 void matmult_s_tiling_sse2_1(unsigned int M, unsigned int K, unsigned int N,
-                             float_t *A, float_t *B, float_t *C)
+                             cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m2, n2, k2;
     unsigned int m_step, n_step, k_step;
-    float_t *mul1, *mul2, *res;
-    float_t *RESTRICT rres;
-    float_t *RESTRICT rmul1;
-    float_t *RESTRICT rmul2;
+    cblas_float *mul1, *mul2, *res;
+    cblas_float *RESTRICT rres;
+    cblas_float *RESTRICT rmul1;
+    cblas_float *RESTRICT rmul2;
 
     mul1 = A;
     mul2 = B;
@@ -449,7 +451,7 @@ void matmult_s_tiling_sse2_1(unsigned int M, unsigned int K, unsigned int N,
 }
 
 void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
-                           float_t *A, float_t *B, float_t *C)
+                           cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m2, n2, k2;
@@ -459,10 +461,10 @@ void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
     unsigned int k_start, k_end;
     //*/
     unsigned int m_step, n_step, k_step;
-    float_t *mul1, *mul2, *res;
-    float_t *RESTRICT rres;
-    float_t *RESTRICT rmul1;
-    float_t *RESTRICT rmul2;
+    cblas_float *mul1, *mul2, *res;
+    cblas_float *RESTRICT rres;
+    cblas_float *RESTRICT rmul1;
+    cblas_float *RESTRICT rmul2;
 
     mul1 = A;
     mul2 = B;
@@ -517,10 +519,12 @@ void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
     }
 }
 
+#endif  /* _MSC_VER */
+
 #define MATRIX_AB_NEED_TRANSPOSE     0
 
 void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
-                         float_t *A, float_t *B, float_t *C)
+                         cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m_start, m_end;
@@ -639,7 +643,7 @@ void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
     //
 
 #if CBLAS_USE_ROWMAJOR
-    float_t A_m_k;
+    cblas_float A_m_k;
 
     // (1.185 seconds)
     m_step = 32;
@@ -759,7 +763,7 @@ void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
         n_step = N;
 
 #if 1
-    float_t *C_, *B_, *A_;
+    cblas_float *C_, *B_, *A_;
     // ·Ö¿éÑ­»·Ë³ÐòK, M, N
     k_start = 0;
     k_end   = k_start + k_step;
@@ -788,7 +792,7 @@ void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
 #else
                         A_m_k = A[m * K + k];
 #endif  /* MATRIX_AB_NEED_TRANSPOSE */
-                        if (fabs(A_m_k) > (float_t)FLOAT_T_EPSILON) {
+                        if (fabs(A_m_k) > (cblas_float)FLOAT_T_EPSILON) {
                             C_ = &C[m * N + n_start];
                             B_ = &B[k * N + n_start];
 #if (_MULT_SSE2_MODE == 1)
@@ -979,7 +983,7 @@ L001:
             k_end = K;
     }
 #elif 1
-    float_t *C_, *B_;
+    cblas_float *C_, *B_;
     // ·Ö¿éÑ­»·Ë³ÐòK, M, N
     k_start = 0;
     k_end   = k_start + k_step;
@@ -1006,7 +1010,7 @@ L001:
 #else
                         A_m_k = A[m * K + k];
 #endif  /* MATRIX_AB_NEED_TRANSPOSE */
-                        if (fabs(A_m_k) > (float_t)FLOAT_T_EPSILON) {
+                        if (fabs(A_m_k) > (cblas_float)FLOAT_T_EPSILON) {
                             C_ = &C[m * N];
                             B_ = &B[k * N];
                             // (0 - 512), 512 x 8 = 4096 bytes(1 page size), only need 1 TLB entry,
@@ -1060,7 +1064,7 @@ L001:
 #else
                         A_m_k = A[m * K + k];
 #endif  /* MATRIX_AB_NEED_TRANSPOSE */
-                        if (fabs(A_m_k) > (float_t)FLOAT_T_EPSILON) {
+                        if (fabs(A_m_k) > (cblas_float)FLOAT_T_EPSILON) {
                             // (0 - 512), 512 x 8 = 4096 bytes(1 page size), only need 1 TLB entry,
                             // but in C[m, n], need n_step TLB entry too.
                             for (n = n_start; n < n_end; ++n) {
@@ -1089,7 +1093,7 @@ L001:
 
 #else  /* !CBLAS_USE_ROWMAJOR */
 
-    float_t B_k_n;
+    cblas_float B_k_n;
     // fastest (1.27-1.29 seconds)
     m_step = 1024;
     k_step = 64;
@@ -1155,15 +1159,15 @@ L001:
 }
 
 void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
-                                  float_t *A, float_t *B, float_t *C)
+                                  cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m_start, m_end;
     unsigned int n_start, n_end;
     unsigned int k_start, k_end;
     unsigned int m_step, n_step, k_step;
-    float_t *C_, *B_, *A_;
-    float_t A_m_k = (float_t)0.0;
+    cblas_float *C_, *B_, *A_;
+    cblas_float A_m_k = (cblas_float)0.0;
 
     //
     // matrix multiplication: C = A * B
@@ -1396,7 +1400,7 @@ void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N
         __asm { movapd      xmmword ptr [ecx + (addr) + 6 * 8], xmm3    }
 
 void matmult_s_tiling_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
-                               float_t *A, float_t *B, float_t *C)
+                               cblas_float *A, cblas_float *B, cblas_float *C)
 {
     unsigned int m, n, k;
     unsigned int m2, n2, k2;
@@ -1406,10 +1410,10 @@ void matmult_s_tiling_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
     unsigned int k_start, k_end;
     //*/
     unsigned int m_step, n_step, k_step;
-    float_t *mul1, *mul2, *res;
-    float_t *RESTRICT rres;
-    float_t *RESTRICT rmul1;
-    float_t *RESTRICT rmul2;
+    cblas_float *mul1, *mul2, *res;
+    cblas_float *RESTRICT rres;
+    cblas_float *RESTRICT rmul1;
+    cblas_float *RESTRICT rmul2;
 
     mul1 = A;
     mul2 = B;
@@ -1539,7 +1543,7 @@ void matmult_s_tiling_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
                             _mm_store_pd(&rres[n2 + 6], mm3);
                         }
 #else
-                        float_t *pmul1, *pmul2, *pres;
+                        cblas_float *pmul1, *pmul2, *pres;
                         pmul1 = &rmul1[k2];
                         pmul2 = &rmul2[0];
                         pres  = &rres[0];

@@ -12,21 +12,21 @@
 void cblas_dgemm(const Cblas_Order order, const Cblas_Transpose transA,
                  const Cblas_Transpose transB,
                  const cblas_int m, const cblas_int n, const cblas_int k,
-                 const float_t *alpha,
-                 const float_t *a, const cblas_int lda,
-                 const float_t *b, const cblas_int ldb,
-                 const float_t *beta,
-                 float_t *c, const cblas_int ldc,
+                 const cblas_float *alpha,
+                 const cblas_float *a, const cblas_int lda,
+                 const cblas_float *b, const cblas_int ldb,
+                 const cblas_float *beta,
+                 cblas_float *c, const cblas_int ldc,
                  cblas_func gemm_func)
 {
     cblas_arg_t args;
     int transa, transb;
     cblas_int nrowa, nrowb, info;
 
-    float_t *buffer = NULL;
-    float_t *sa, *sb;
+    cblas_float *buffer = NULL;
+    cblas_float *sa, *sb;
 
-    int mode = BLAS_DOUBLE  | BLAS_REAL;
+    int mode = BLAS_DOUBLE | BLAS_REAL;
 
     args.alpha = (void *)alpha;
     args.beta  = (void *)beta;
