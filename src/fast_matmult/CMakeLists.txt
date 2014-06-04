@@ -6,8 +6,8 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_C_COMPILER g++)
 
-add_definitions("-Dmsse")
-add_definitions("-Dmsse2")
+add_definitions("-msse")
+add_definitions("-msse2")
 
 add_definitions("-D__MMX__")
 add_definitions("-D__SSE__")

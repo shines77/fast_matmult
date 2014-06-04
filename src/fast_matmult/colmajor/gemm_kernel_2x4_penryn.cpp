@@ -105,17 +105,17 @@
 #define PREFETCH_SIZE   (8 * 13 + 4)
 #endif
 
-#if (_WIN32 || _WIN64) && _MSC_VER
+#ifdef _MSC_VER
 
 __declspec(naked)
-void __CDECL
+void __CDECL _GCC_CDECL
 gemm_kernel_2x4_penryn(const int m, const int n, const int k,
                        const cblas_float alpha,
                        const cblas_float *a, const int lda,
                        const cblas_float *b, const int ldb,
                        const cblas_float beta,
                        cblas_float *c, const int ldc,
-                       const int offset) _GCC_CDECL
+                       const int offset)
 {
     __asm {
         sub     esp, ARGS      // # Generate Stack Frame

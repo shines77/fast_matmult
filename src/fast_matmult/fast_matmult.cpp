@@ -1019,6 +1019,7 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         if (!verify_ok)
             printf("verify_ok = %5s, diff_nums = %d, equal_nums = %d\n\n", verify_bool[verify_ok], diff_nums, M * N - diff_nums);
 
+#ifdef _MSC_VER
         /*************************************
          *     gemm_kernel_2x4_penryn()      *
          *************************************/
@@ -1058,6 +1059,8 @@ void matrix_matmult_test(int routine_mode, unsigned int M, unsigned int K, unsig
         printf("C1[%d] = %0.5f, C3[%d] = %0.5f\n", N + 1, C1[0 + N + 1], M + 1, C3[0 + M + 1]);
         printf("\n");
         //*/
+
+#endif  /* _MSC_VER */
     }
 
     goto MATRIX_MULT_EXIT;

@@ -450,6 +450,8 @@ void matmult_s_tiling_sse2_1(unsigned int M, unsigned int K, unsigned int N,
     }
 }
 
+#endif  /* _MSC_VER */
+
 void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
                            cblas_float *A, cblas_float *B, cblas_float *C)
 {
@@ -519,13 +521,12 @@ void matmult_s_tiling_sse2(unsigned int M, unsigned int K, unsigned int N,
     }
 }
 
-#endif  /* _MSC_VER */
-
 #define MATRIX_AB_NEED_TRANSPOSE     0
 
 void matrix_fast_matmult(unsigned int M, unsigned int K, unsigned int N,
                          cblas_float *A, cblas_float *B, cblas_float *C)
 {
+#ifdef _MSC_VER
     unsigned int m, n, k;
     unsigned int m_start, m_end;
     unsigned int n_start, n_end;
@@ -1156,11 +1157,13 @@ L001:
     }
 #endif  /* CBLAS_USE_ROWMAJOR */
 
+#endif  /* _MSC_VER */
 }
 
 void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
                                   cblas_float *A, cblas_float *B, cblas_float *C)
 {
+#ifdef _MSC_VER
     unsigned int m, n, k;
     unsigned int m_start, m_end;
     unsigned int n_start, n_end;
@@ -1369,6 +1372,8 @@ void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N
         if (k_end > K)
             k_end = K;
     }
+
+#endif  /* _MSC_VER */
 }
 
 #define KERNEL_SEE2_4X2(addr)                                             \
@@ -1402,6 +1407,7 @@ void matrix_fast_matmult_sse2_4x2(unsigned int M, unsigned int K, unsigned int N
 void matmult_s_tiling_sse2_4x2(unsigned int M, unsigned int K, unsigned int N,
                                cblas_float *A, cblas_float *B, cblas_float *C)
 {
+#ifdef _MSC_VER
     unsigned int m, n, k;
     unsigned int m2, n2, k2;
     /*
@@ -1942,4 +1948,6 @@ L01:
 
     //__asm { sfence }
     //__asm { emms }
+
+#endif  /* _MSC_VER */
 }

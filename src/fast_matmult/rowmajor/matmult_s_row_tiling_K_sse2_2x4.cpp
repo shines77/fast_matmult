@@ -88,6 +88,7 @@ void matmult_s_row_tiling_NxM_K_sse2_2x4(const int M, const int N, const int K,
                                          const cblas_float beta,
                                          cblas_float *C, const int ldc)
 {
+#ifdef _MSC_VER
     int m, n, k;
     int m_start, m_end;
     int n_start, n_end;
@@ -642,6 +643,8 @@ L15:
     __asm {
         //emms
     }
+
+#endif  /* _MSC_VER */
 }
 
 void matmult_s_row_tiling_MxN_K_transB_sse2_2x4(const int M, const int N, const int K,

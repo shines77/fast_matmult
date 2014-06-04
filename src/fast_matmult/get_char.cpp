@@ -1,10 +1,13 @@
 
 #include <stdio.h>
 
-#if defined(__linux__)
+#if defined(__MINGW32__)
+#include <conio.h>
+#include <unistd.h>
+#elif defined(__linux__)
 #include <termios.h>
 #include <unistd.h>
-#endif  /* __linux__ */
+#endif  /* __MINGW32__ */
 
 #if defined(_MSC_VER)
 #include <conio.h>
@@ -13,6 +16,29 @@
 
 #include <fast_matmult/get_char.h>
 
+#if defined(__MINGW32__)
+
+/* Read 1 character without echo */
+char iso_getch(void)
+{
+    return _getch();
+}
+
+/* Read 1 character with echo */
+char iso_getche(void)
+{
+    char ch = _getch();
+    printf("%d", ch);
+    return ch;
+}
+
+void iso_sleep(int millisec)
+{
+    usleep(millisec * 1000);
+}
+
+#elif defined(__linux__)
+
 /// <comment>
 ///
 /// What is equivalent to getch() & getche() in Linux?
@@ -20,8 +46,6 @@
 /// From: http://stackoverflow.com/questions/7469139/what-is-equivalent-to-getch-getche-in-linux
 ///
 /// </comment>
-
-#if defined(__linux__)
 
 static struct termios s_term_old, s_term_new;
 

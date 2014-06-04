@@ -77,6 +77,7 @@ void matmult_s_row_tiling_KxM_N_sse2_2x4_packed(const int M, const int N, const 
                                                 const cblas_float beta,
                                                 cblas_float *C, const int ldc)
 {
+#ifdef _MSC_VER
     int m, n, k;
     int m_start, m_end;
     int n_start, n_end;
@@ -545,6 +546,8 @@ L01:
 
     TILING_OUTER_LOOP_END(k, m, n);
     //TILING_OUTER_LOOP_END(m, k, n);
+
+#endif  /* _MSC_VER */
 }
 
 ///////////////////////////////////////////////////////////////////////////
