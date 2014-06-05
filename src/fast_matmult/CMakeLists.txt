@@ -6,6 +6,10 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_C_COMPILER g++)
 
+#
+# Use sse, sse2 in gcc
+# Reference: http://stackoverflow.com/questions/5217812/c-compilation-issue-with-emmintrin-h-on-linux-gcc
+#
 add_definitions("-msse")
 add_definitions("-msse2")
 
