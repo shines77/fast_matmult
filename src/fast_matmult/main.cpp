@@ -52,8 +52,10 @@
 using namespace annlab;
 
 /**********************************************************
-   Use Visual Leak Detector(vld) for Visual C++,
-   Homepage: http://vld.codeplex.com/
+ *
+ *  Use Visual Leak Detector(vld) for Visual C++,
+ *  Homepage: http://vld.codeplex.com/
+ *
  **********************************************************/
 #ifdef _MSC_VER
 #ifdef _DEBUG
@@ -61,6 +63,8 @@ using namespace annlab;
 //#include <vld.h>
 #endif  /* _DEBUG */
 #endif  /* _MSC_VER */
+
+/* 设置CRTDBG的环境(Debug模式下, 检查内存越界和内存泄漏问题) */
 
 void set_crtdbg_env()
 {
@@ -289,9 +293,12 @@ int main(int argc, char *argv[])
     //routine_mode = 3;
     routine_mode = get_routine_mode(3);
     if (routine_mode == GETCH_EXIT_PROGRAM) {
+        system("pause");
         return 0;
         //goto L_EXIT_MAIN;
     }
+
+    printf("\n");
 
 #if 1
 
@@ -315,6 +322,7 @@ int main(int argc, char *argv[])
     printf("\n");
 
 	if (n == 0) {
+        system("pause");
 	    return 0;
 		//goto L_EXIT_MAIN;
     }
@@ -413,7 +421,7 @@ int main(int argc, char *argv[])
     huge_tlb_exit(echo);
     printf("\n");
 
-L_EXIT_MAIN:
+//L_EXIT_MAIN:
     system("pause");
     return 0;
 }
