@@ -34,7 +34,7 @@
 #define INLINE              __inline
 #define FORCE_INLINE        __forceinline
 #define RESTRICT            __restrict
-#elif defined(__GNUC__) && 0
+#elif defined(__GNUC__)
 #define INLINE              inline
 #define FORCE_INLINE        inline
 #define RESTRICT            restrict
