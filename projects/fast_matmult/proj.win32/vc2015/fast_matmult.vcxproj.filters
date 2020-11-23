@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\serial_matmult">
+      <UniqueIdentifier>{268fff51-c34b-4716-8f45-00919eaa79a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\serial_matmult\rowmajor">
+      <UniqueIdentifier>{4b4fdca8-1938-4734-bda2-e586f4f7cf46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\serial_matmult\colmajor">
+      <UniqueIdentifier>{52242c09-cb97-40e2-9ce8-39ac4ef02233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="include\vs">
+      <UniqueIdentifier>{8749cb21-ee62-4504-b868-b0cdda7868f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\serial_matmult">
+      <UniqueIdentifier>{b6ac281d-891c-41cb-b1bf-664b4319d774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\serial_matmult\rowmajor">
+      <UniqueIdentifier>{bb378893-d61d-4c93-9da7-396255610bdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\serial_matmult\colmajor">
+      <UniqueIdentifier>{07fb3e15-1ab1-4b29-9dfb-aa4b2666125a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\aligned_malloc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\cblas_dgemm.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\fast_matmult.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\get_char.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\huge_tlb.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\lang_def.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_Misc.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_K.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_K_sse2_2x4.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_K_sse2_2x4_packed.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4_packed.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_4x1.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\rowmajor\matmult_s_row_X.cpp">
+      <Filter>src\serial_matmult\rowmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\colmajor\gemm_kernel_2x4_penryn.cpp">
+      <Filter>src\serial_matmult\colmajor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\fast_matmult\colmajor\matmult_s_col_X.cpp">
+      <Filter>src\serial_matmult\colmajor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\aligned_malloc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\cblas_def.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\cblas_dgemm.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\common_asm.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\fast_matmult.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\get_char.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\huge_tlb.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\iacaMarks.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\lang_def.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\stop_watch.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\vs\stdint.h">
+      <Filter>include\vs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_Misc.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K_sse2_2x4.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_K_sse2_2x4_packed.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_2x4_packed.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_tiling_N_sse2_4x1.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\rowmajor\matmult_s_row_X.h">
+      <Filter>include\serial_matmult\rowmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\colmajor\gemm_kernel_2x4_penryn.h">
+      <Filter>include\serial_matmult\colmajor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\fast_matmult\colmajor\matmult_s_col_X.h">
+      <Filter>include\serial_matmult\colmajor</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

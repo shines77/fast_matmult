@@ -51,6 +51,46 @@
 
 using namespace annlab;
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+#define _N   2048
+double A[_N][_N];
+double B[_N][_N];
+double C[_N][_N];
+
+void simple_martrix_test()
+{
+    // populate the matrices with random values between 0.0 and 1.0
+    for (int i = 0; i < _N; i++) {
+        for (int j = 0; j < _N; j++) {
+            A[i][j] = (double)rand() / (double)RAND_MAX;
+            B[i][j] = (double)rand() / (double)RAND_MAX;
+            C[i][j] = 0.0;
+        }
+    }
+
+    stop_watch sw;
+    double time_spent;
+
+    // matrix multiplication
+    sw.start();
+    for (int i = 0; i < _N; i++) {
+        for (int j = 0; j < _N; j++) {
+            for (int k = 0; k < _N; k++) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    sw.stop();
+
+    time_spent = sw.getMillisec();
+    printf("C[1024][1024] = %0.5f\n\n"
+           "Elapsed time: %6.2f ms\n\n",
+           C[1024][1024], time_spent);
+}
+
 /**********************************************************
  *
  *  Use Visual Leak Detector(vld) for Visual C++,
@@ -299,6 +339,8 @@ int main(int argc, char *argv[])
     }
 
     printf("\n");
+
+    //simple_martrix_test();
 
 #if 1
 
